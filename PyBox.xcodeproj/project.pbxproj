@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -111,13 +111,13 @@
 		43E3A157F1120D1A9D754C30 /* MarkdownCodeBlockExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownCodeBlockExtractor.swift; sourceTree = "<group>"; };
 		45DB7E4054FCDD69EC074B85 /* QuickPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickPrompt.swift; sourceTree = "<group>"; };
 		4B90FE6EB8557FB02AA5CE81 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		4E9434C3B5D0B26EE4ED66CB /* PyBoxTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PyBoxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		5178EF176842E746BC073DE9 /* PyBoxWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PyBoxWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E9434C3B5D0B26EE4ED66CB /* PyBoxTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PyBoxTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5178EF176842E746BC073DE9 /* PyBoxWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = PyBoxWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		533D9A34B08D4872DF8B985E /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		540D64E819ECACC1F84CC173 /* KeyboardShortcutsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutsView.swift; sourceTree = "<group>"; };
 		5744945ABC154307EF65E3DB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5E2DD25853ECE6D6E4A58BFD /* PyBoxWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PyBoxWidget.swift; sourceTree = "<group>"; };
-		64627C89825F1DF9919B3180 /* PyBox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PyBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		64627C89825F1DF9919B3180 /* PyBox.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PyBox.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F073AB4FF52CAE411167732 /* TerminalViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalViewModel.swift; sourceTree = "<group>"; };
 		7196E578A1E508B5F61766AB /* BlackFormatterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlackFormatterService.swift; sourceTree = "<group>"; };
 		72FB875E06C7569BAC3D443E /* FileBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileBrowserView.swift; sourceTree = "<group>"; };
@@ -136,7 +136,7 @@
 		A193C1E0ADE011ACD24F1432 /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		A53A2D5CAC1F39432B835502 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 		AB0F69C2CF44D1668AC7DB01 /* EditorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewModelTests.swift; sourceTree = "<group>"; };
-		AC2B8C2D5037C7162D701070 /* PyBoxShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PyBoxShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC2B8C2D5037C7162D701070 /* PyBoxShare.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = PyBoxShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC815AB329D408AB95AE6340 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Python.xcframework; path = "$(SRCROOT)/Resources/Python.xcframework"; sourceTree = SDKROOT; };
 		C3BCF1C69DA6595294D39869 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		C735D87203C9054CDC92BA63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -688,12 +688,16 @@
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					44B980A967E2AFE801B916BF = {
+						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					A4409CA6374744DBEC69601A = {
 						ProvisioningStyle = Automatic;
 					};
 					BE3DED2AD20502B7D1B39588 = {
+						ProvisioningStyle = Automatic;
+					};
+					C58C4BDCC16DBA847D8DA82D = {
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -713,6 +717,7 @@
 				A8270323B69099D136FEDFCB /* XCRemoteSwiftPackageReference "SQLite.swift" */,
 				C3F440C52D51E644F270E6B4 /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -876,10 +881,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = App/PyBox.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 52K57HQ5YV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Resources/Python.xcframework/ios-arm64_x86_64-simulator/Python.framework/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = PyBox;
@@ -889,19 +892,14 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "PyBox 需要使用相机来扫描二维码";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "PyBox 需要使用麦克风来录制语音备忘";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIFileSharingEnabled = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pybox.ide;
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1054,7 +1052,7 @@
 				CODE_SIGNING_REQUIRED = NO;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 52K57HQ5YV;
+				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1074,11 +1072,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PyBoxWidget/PyBoxWidget.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YGH3QAHBPK;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PyBoxWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "PyBox Widget";
@@ -1089,7 +1084,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pybox.ide.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pybox.ide.widget;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = iphoneos;
@@ -1102,11 +1097,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = PyBoxShare/PyBoxShare.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = YGH3QAHBPK;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = PyBoxShare/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PyBox;
@@ -1117,7 +1109,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pybox.ide.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pybox.ide.share;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = iphoneos;
@@ -1186,7 +1178,6 @@
 				CODE_SIGN_ENTITLEMENTS = App/PyBox.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 52K57HQ5YV;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Resources/Python.xcframework/ios-arm64_x86_64-simulator/Python.framework/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = PyBox;
@@ -1196,12 +1187,8 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "PyBox 需要使用相机来扫描二维码";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "PyBox 需要使用麦克风来录制语音备忘";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIFileSharingEnabled = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
