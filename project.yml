@@ -73,51 +73,54 @@ targets:
         runOnlyWhenInstalling: false
         script: |
           set -e
-          SRC_FW="${SRCROOT}/Resources/Python.xcframework/ios-arm64_x86_64-simulator/Python.framework"
+          PYTHON_XC="${SRCROOT}/Resources/Python.xcframework"
+
+          # Select simulator vs device Python framework
+          if [ "${PLATFORM_NAME}" = "iphonesimulator" ]; then
+            FW_SUFFIX="ios-arm64_x86_64-simulator"
+          else
+            FW_SUFFIX="ios-arm64"
+          fi
+
+          SRC_FW="${PYTHON_XC}/${FW_SUFFIX}/Python.framework"
           DST_FW="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Frameworks/Python.framework"
           mkdir -p "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Frameworks"
           rsync -av --delete "${SRC_FW}/" "${DST_FW}/"
-          
-          # Copy complete stdlib (shared lib folder) to app bundle
-          SRC_STDLIB="${SRCROOT}/Resources/Python.xcframework/lib/python3.14"
+
+          # Copy complete stdlib to app bundle
+          SRC_STDLIB="${PYTHON_XC}/lib/python3.14"
           DST_STDLIB="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/python3.14"
           mkdir -p "${DST_STDLIB}"
           cp -R "${SRC_STDLIB}/." "${DST_STDLIB}/"
-          
-          # Also copy platform-specific binary modules (lib-dynload)
-          SRC_LIB_X86="${SRCROOT}/Resources/Python.xcframework/ios-arm64_x86_64-simulator/lib-x86_64/python3.14/lib-dynload"
-          SRC_LIB_ARM="${SRCROOT}/Resources/Python.xcframework/ios-arm64_x86_64-simulator/lib-arm64/python3.14/lib-dynload"
-          mkdir -p "${DST_STDLIB}/lib-dynload"
-          if [ -d "${SRC_LIB_X86}" ]; then
-            cp -R "${SRC_LIB_X86}/." "${DST_STDLIB}/lib-dynload/" 2>/dev/null || true
+
+          # Copy platform-specific binary modules (lib-dynload) for device
+          if [ -d "${PYTHON_XC}/${FW_SUFFIX}/lib/python3.14/lib-dynload" ]; then
+            mkdir -p "${DST_STDLIB}/lib-dynload"
+            cp -R "${PYTHON_XC}/${FW_SUFFIX}/lib/python3.14/lib-dynload/." "${DST_STDLIB}/lib-dynload/" 2>/dev/null || true
           fi
-          if [ -d "${SRC_LIB_ARM}" ]; then
-            cp -R "${SRC_LIB_ARM}/." "${DST_STDLIB}/lib-dynload/" 2>/dev/null || true
+          # Also copy lib-arm64 variant if available
+          if [ -d "${PYTHON_XC}/${FW_SUFFIX}/lib-arm64/python3.14/lib-dynload" ]; then
+            mkdir -p "${DST_STDLIB}/lib-dynload"
+            cp -R "${PYTHON_XC}/${FW_SUFFIX}/lib-arm64/python3.14/lib-dynload/." "${DST_STDLIB}/lib-dynload/" 2>/dev/null || true
           fi
-          
-          # Copy third-party Python packages (PIL/Pillow, etc.) from site-packages directory
+
+          # Copy third-party Python packages (PIL, autopep8, etc.)
           SRC_SITE_PKGS="${SRCROOT}/Resources/site-packages"
           DST_SITE_PKGS="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/site-packages"
           if [ -d "${SRC_SITE_PKGS}" ]; then
             rm -rf "${DST_SITE_PKGS}"
             mkdir -p "${DST_SITE_PKGS}"
             cp -R "${SRC_SITE_PKGS}/." "${DST_SITE_PKGS}/"
-            echo "Third-party Python packages copied to: ${DST_SITE_PKGS}"
           fi
-          
-          # Sign the framework
-          codesign --force --sign - "${DST_FW}" 2>/dev/null || true
-          
-          echo "Python framework: ${DST_FW}"
-          echo "Python stdlib: ${DST_STDLIB}"
-          echo "Python site-packages: ${DST_SITE_PKGS:-not found}"
 
-          # Only fix Info.plist for simulator builds (Xcode 16 embeddedBinaryValidationUtility needs consistency)
+          # Sign the framework (ad-hoc for simulator, real cert for device)
+          codesign --force --sign - "${DST_FW}" 2>/dev/null || true
+
+          # Fix Info.plist for simulator builds
           if [ "${PLATFORM_NAME}" = "iphonesimulator" ]; then
             INFO_PLIST="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Info.plist"
             if [ -f "${INFO_PLIST}" ]; then
               plutil -replace CFBundleSupportedPlatforms -json '["iPhoneSimulator"]' "${INFO_PLIST}" 2>/dev/null || true
-              echo "Fixed Info.plist platform for simulator"
             fi
           fi
 
