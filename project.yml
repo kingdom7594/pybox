@@ -1,0 +1,202 @@
+name: PyBox
+options:
+  bundleIdPrefix: com.pybox
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "16.0"
+  generateEmptyDirectories: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    ENABLE_BITCODE: NO
+    CODE_SIGN_STYLE: Automatic
+    INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
+    INFOPLIST_KEY_UILaunchScreen_Generation: YES
+    INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+    INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+    SUPPORTS_MACCATALYST: NO
+  configs:
+    Debug:
+      SUPPORTS_MACCATALYST: NO
+      SUPPORTED_PLATFORMS: "iphonesimulator"
+      VALIDATE_WORKSPACE: NO
+    Release:
+      SUPPORTS_MACCATALYST: NO
+      SUPPORTED_PLATFORMS: "iphoneos"
+      VALIDATE_WORKSPACE: NO
+
+targets:
+  PyBox:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Features
+      - path: Core
+      - path: Shared
+      - path: Resources
+        excludes:
+          - "Python.xcframework/**"
+          - "site-packages/**"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pybox.ide
+        INFOPLIST_KEY_CFBundleDisplayName: PyBox
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "PyBox 需要使用麦克风来录制语音备忘"
+        INFOPLIST_KEY_NSCameraUsageDescription: "PyBox 需要使用相机来扫描二维码"
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.developer-tools"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UIStatusBarStyle: UIStatusBarStyleLightContent
+        INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace: YES
+        INFOPLIST_KEY_UIFileSharingEnabled: YES
+        INFOPLIST_KEY_CFBundleDocumentTypes: '<array><dict><key>CFBundleTypeName</key><string>Python Script</string><key>CFBundleTypeRole</key><string>Editor</string><key>LSHandlerRank</key><string>Owner</string><key>LSItemContentTypes</key><array><string>public.python-script</string><string>public.plain-text</string><string>public.json</string><string>public.text</string></array></dict></array>'
+        CODE_SIGN_ENTITLEMENTS: App/PyBox.entitlements
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - package: SnapKit
+      - package: SQLite.swift
+        product: SQLite
+      - package: PythonKit
+      - sdk: $(SRCROOT)/Resources/Python.xcframework
+      - target: PyBoxShare
+      - target: PyBoxWidget
+    postBuildScripts:
+      - name: Embed Python Framework and Resources
+        runOnlyWhenInstalling: false
+        script: |
+          set -e
+          SRC_FW="${SRCROOT}/Resources/Python.xcframework/ios-arm64_x86_64-simulator/Python.framework"
+          DST_FW="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Frameworks/Python.framework"
+          mkdir -p "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Frameworks"
+          rsync -av --delete "${SRC_FW}/" "${DST_FW}/"
+          
+          # Copy complete stdlib (shared lib folder) to app bundle
+          SRC_STDLIB="${SRCROOT}/Resources/Python.xcframework/lib/python3.14"
+          DST_STDLIB="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/python3.14"
+          mkdir -p "${DST_STDLIB}"
+          cp -R "${SRC_STDLIB}/." "${DST_STDLIB}/"
+          
+          # Also copy platform-specific binary modules (lib-dynload)
+          SRC_LIB_X86="${SRCROOT}/Resources/Python.xcframework/ios-arm64_x86_64-simulator/lib-x86_64/python3.14/lib-dynload"
+          SRC_LIB_ARM="${SRCROOT}/Resources/Python.xcframework/ios-arm64_x86_64-simulator/lib-arm64/python3.14/lib-dynload"
+          mkdir -p "${DST_STDLIB}/lib-dynload"
+          if [ -d "${SRC_LIB_X86}" ]; then
+            cp -R "${SRC_LIB_X86}/." "${DST_STDLIB}/lib-dynload/" 2>/dev/null || true
+          fi
+          if [ -d "${SRC_LIB_ARM}" ]; then
+            cp -R "${SRC_LIB_ARM}/." "${DST_STDLIB}/lib-dynload/" 2>/dev/null || true
+          fi
+          
+          # Copy third-party Python packages (PIL/Pillow, etc.) from site-packages directory
+          SRC_SITE_PKGS="${SRCROOT}/Resources/site-packages"
+          DST_SITE_PKGS="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/site-packages"
+          if [ -d "${SRC_SITE_PKGS}" ]; then
+            rm -rf "${DST_SITE_PKGS}"
+            mkdir -p "${DST_SITE_PKGS}"
+            cp -R "${SRC_SITE_PKGS}/." "${DST_SITE_PKGS}/"
+            echo "Third-party Python packages copied to: ${DST_SITE_PKGS}"
+          fi
+          
+          # Sign the framework
+          codesign --force --sign - "${DST_FW}" 2>/dev/null || true
+          
+          echo "Python framework: ${DST_FW}"
+          echo "Python stdlib: ${DST_STDLIB}"
+          echo "Python site-packages: ${DST_SITE_PKGS:-not found}"
+
+          # Only fix Info.plist for simulator builds (Xcode 16 embeddedBinaryValidationUtility needs consistency)
+          if [ "${PLATFORM_NAME}" = "iphonesimulator" ]; then
+            INFO_PLIST="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Info.plist"
+            if [ -f "${INFO_PLIST}" ]; then
+              plutil -replace CFBundleSupportedPlatforms -json '["iPhoneSimulator"]' "${INFO_PLIST}" 2>/dev/null || true
+              echo "Fixed Info.plist platform for simulator"
+            fi
+          fi
+
+  PyBoxShare:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PyBoxShare
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pybox.ide.share
+        INFOPLIST_KEY_CFBundleDisplayName: PyBox
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        CODE_SIGN_ENTITLEMENTS: PyBoxShare/PyBoxShare.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: PyBoxShare/Info.plist
+        SWIFT_VERSION: "5.9"
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        SKIP_INSTALL: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Automatic
+      configs:
+        Debug:
+          SUPPORTED_PLATFORMS: "iphonesimulator"
+        Release:
+          SUPPORTED_PLATFORMS: "iphoneos"
+
+  PyBoxWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: PyBoxWidget
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pybox.ide.widget
+        INFOPLIST_KEY_CFBundleDisplayName: PyBox Widget
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        CODE_SIGN_ENTITLEMENTS: PyBoxWidget/PyBoxWidget.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: PyBoxWidget/Info.plist
+        SWIFT_VERSION: "5.9"
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        SKIP_INSTALL: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Automatic
+      configs:
+        Debug:
+          SUPPORTED_PLATFORMS: "iphonesimulator"
+        Release:
+          SUPPORTED_PLATFORMS: "iphoneos"
+
+  PyBoxTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: PyBoxTests
+    dependencies:
+      - target: PyBox
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.pybox.ide.tests
+        SWIFT_VERSION: "5.9"
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGNING_REQUIRED: NO
+        CODE_SIGNING_ALLOWED: NO
+        DEVELOPMENT_TEAM: ""
+
+packages:
+  SnapKit:
+    url: https://github.com/SnapKit/SnapKit.git
+    from: "5.6.0"
+  SQLite.swift:
+    url: https://github.com/stephencelis/SQLite.swift.git
+    from: "0.14.1"
+  PythonKit:
+    url: https://github.com/pvieito/PythonKit.git
+    branch: main

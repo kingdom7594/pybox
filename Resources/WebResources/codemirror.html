@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PyBox Code Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
+            background-color: #1E1E1E;
+        }
+        
+        #editor {
+            height: 100%;
+            width: 100%;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .cm-editor {
+            height: 100%;
+            background-color: #1E1E1E;
+        }
+        
+        .cm-scroller {
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .cm-content {
+            caret-color: #58A6FF;
+            padding: 8px 0;
+        }
+        
+        .cm-line {
+            padding: 0 8px;
+        }
+        
+        .cm-gutters {
+            background-color: #252526;
+            color: #858585;
+            border: none;
+            padding-right: 8px;
+        }
+        
+        .cm-lineNumbers .cm-gutterElement {
+            padding: 0 8px 0 4px;
+            min-width: 40px;
+        }
+        
+        .cm-activeLineGutter {
+            background-color: #2D2D2D;
+        }
+        
+        .cm-activeLine {
+            background-color: #2D2D2D;
+        }
+        
+        .cm-cursor {
+            border-left-color: #58A6FF;
+            border-left-width: 2px;
+        }
+        
+        .cm-selectionBackground {
+            background-color: #264F78 !important;
+        }
+        
+        .cm-focused .cm-selectionBackground {
+            background-color: #264F78 !important;
+        }
+        
+        .cm-placeholder {
+            color: #6A9955;
+            font-style: italic;
+        }
+        
+        /* Syntax highlighting - Python */
+        .cm-keyword { color: #C678DD; }
+        .cm-string { color: #98C379; }
+        .cm-number { color: #D19A66; }
+        .cm-comment { color: #5C6370; font-style: italic; }
+        .cm-function { color: #61AFEF; }
+        .cm-variableName { color: #E06C75; }
+        .cm-operator { color: #56B6C2; }
+        .cm-punctuation { color: #ABB2BF; }
+        .cm-className { color: #E5C07B; }
+        .cm-builtin { color: #56B6C2; }
+        .cm-property { color: #E06C75; }
+        .cm-definition { color: #61AFEF; }
+        .cm-typeName { color: #E5C07B; }
+        
+        /* Auto-complete */
+        .cm-tooltip-autocomplete {
+            background-color: #2D2D2D !important;
+            border: 1px solid #475569 !important;
+            border-radius: 4px;
+        }
+        
+        .cm-tooltip-autocomplete ul li {
+            padding: 4px 8px;
+        }
+        
+        .cm-tooltip-autocomplete ul li[aria-selected] {
+            background-color: #264F78 !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="editor"></div>
+    
+    <script type="module">
+        import { EditorState } from 'https://esm.sh/@codemirror/state@6.4.1';
+        import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter, drawSelection, dropCursor, placeholder } from 'https://esm.sh/@codemirror/view@6.26.3';
+        import { defaultKeymap, history, historyKeymap, indentWithTab } from 'https://esm.sh/@codemirror/commands@6.6.0';
+        import { python } from 'https://esm.sh/@codemirror/lang-python@6.1.6';
+        import { syntaxHighlighting, defaultHighlightStyle, bracketMatching, foldGutter, indentOnInput } from 'https://esm.sh/@codemirror/language@6.10.2';
+        import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from 'https://esm.sh/@codemirror/autocomplete@6.18.0';
+        import { searchKeymap, highlightSelectionMatches } from 'https://esm.sh/@codemirror/search@6.5.6';
+        
+        const config = window.config || {};
+        const initialCode = config.initialCode || '# Welcome to PyBox\n# Start coding here\n\nprint("Hello, PyBox!")\n';
+        
+        const updateListener = EditorView.updateListener.of((update) => {
+            if (update.docChanged) {
+                const code = update.state.doc.toString();
+                window.webkit.messageHandlers.editor.postMessage({
+                    type: 'codeChange',
+                    code: code
+                });
+            }
+        });
+        
+        const theme = EditorView.theme({
+            '&': {
+                backgroundColor: '#1E1E1E',
+                color: '#ABB2BF',
+                height: '100%'
+            },
+            '.cm-content': {
+                caretColor: '#58A6FF',
+                fontFamily: "'SF Mono', 'Menlo', monospace",
+                fontSize: (config.fontSize || 14) + 'px'
+            },
+            '.cm-cursor': {
+                borderLeftColor: '#58A6FF'
+            },
+            '.cm-gutters': {
+                backgroundColor: '#252526',
+                color: '#858585',
+                border: 'none'
+            },
+            '.cm-activeLineGutter': {
+                backgroundColor: '#2D2D2D'
+            },
+            '.cm-activeLine': {
+                backgroundColor: '#2D2D2D'
+            },
+            '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
+                backgroundColor: '#264F78'
+            }
+        });
+        
+        const state = EditorState.create({
+            doc: initialCode,
+            extensions: [
+                lineNumbers(),
+                highlightActiveLine(),
+                highlightActiveLineGutter(),
+                history(),
+                foldGutter(),
+                drawSelection(),
+                dropCursor(),
+                indentOnInput(),
+                bracketMatching(),
+                closeBrackets(),
+                autocompletion(),
+                highlightSelectionMatches(),
+                python(),
+                syntaxHighlighting(defaultHighlightStyle),
+                keymap.of([
+                    ...closeBracketsKeymap,
+                    ...defaultKeymap,
+                    ...searchKeymap,
+                    ...historyKeymap,
+                    ...completionKeymap,
+                    indentWithTab
+                ]),
+                updateListener,
+                theme,
+                placeholder('Start coding...')
+            ]
+        });
+        
+        const view = new EditorView({
+            state: state,
+            parent: document.getElementById('editor')
+        });
+        
+        window.setCode = (code) => {
+            view.dispatch({
+                changes: {
+                    from: 0,
+                    to: view.state.doc.length,
+                    insert: code
+                }
+            });
+        };
+        
+        window.getCode = () => {
+            return view.state.doc.toString();
+        };
+        
+        window.setFontSize = (size) => {
+            document.querySelector('.cm-content').style.fontSize = size + 'px';
+        };
+        
+        window.focusEditor = () => {
+            view.focus();
+        };
+        
+        window.webkit.messageHandlers.editor.postMessage({
+            type: 'ready'
+        });
+    </script>
+</body>
+</html>
