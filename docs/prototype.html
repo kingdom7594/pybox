@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PyBox - iOS Python IDE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --secondary: #22D3EE;
+            --accent: #F59E0B;
+            --success: #10B981;
+            --error: #EF4444;
+            --bg-dark: #0F172A;
+            --bg-dark-plus: #1E293B;
+            --bg-dark-plus-plus: #334155;
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --border: #475569;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .phone-frame {
+            width: 390px;
+            height: 844px;
+            background: var(--bg-dark);
+            border-radius: 50px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.5), inset 0 0 0 2px #333;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 37px;
+            background: #000;
+            border-radius: 24px;
+            z-index: 100;
+        }
+
+        .screen {
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            background: var(--bg-dark);
+            padding-top: 60px;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-dark-plus);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .nav-btn {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: var(--bg-dark-plus-plus);
+            color: var(--text-primary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+            background: var(--border);
+        }
+
+        .nav-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .run-btn {
+            background: var(--primary);
+        }
+
+        .run-btn:active {
+            background: var(--primary-dark);
+        }
+
+        /* Editor Screen */
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .file-tabs {
+            display: flex;
+            background: var(--bg-dark-plus);
+            padding: 8px 8px 0;
+            overflow-x: auto;
+            gap: 4px;
+        }
+
+        .file-tab {
+            padding: 10px 16px;
+            background: var(--bg-dark-plus-plus);
+            border-radius: 8px 8px 0 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-tab.active {
+            background: var(--bg-dark);
+            color: var(--text-primary);
+        }
+
+        .file-tab .close {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.5;
+        }
+
+        .file-tab .close:hover {
+            opacity: 1;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .code-editor {
+            flex: 1;
+            background: var(--bg-dark);
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            overflow-y: auto;
+            white-space: pre-wrap;
+            position: relative;
+        }
+
+        .code-editor .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 16px;
+            width: 40px;
+            text-align: right;
+            padding-right: 12px;
+            color: var(--text-muted);
+            user-select: none;
+        }
+
+        .code-editor .code-content {
+            margin-left: 40px;
+        }
+
+        .code-keyword { color: #C678DD; }
+        .code-function { color: #61AFEF; }
+        .code-string { color: #98C379; }
+        .code-comment { color: #5C6370; font-style: italic; }
+        .code-number { color: #D19A66; }
+        .code-class { color: #E5C07B; }
+        .code-decorator { color: #E5C07B; }
+        .code-builtin { color: #56B6C2; }
+        .code-operator { color: #56B6C2; }
+
+        .output-panel {
+            height: 200px;
+            background: var(--bg-dark-plus);
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .output-tabs {
+            display: flex;
+            gap: 16px;
+        }
+
+        .output-tab {
+            padding: 4px 0;
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .output-tab.active {
+            color: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        .output-content {
+            flex: 1;
+            padding: 12px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            overflow-y: auto;
+        }
+
+        .output-content .success { color: var(--success); }
+        .output-content .error { color: var(--error); }
+
+        /* Bottom Toolbar */
+        .bottom-toolbar {
+            display: flex;
+            background: var(--bg-dark-plus);
+            border-top: 1px solid var(--border);
+            padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+        }
+
+        .toolbar-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            border-radius: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn.active, .toolbar-btn:active {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .toolbar-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .toolbar-btn span {
+            font-size: 11px;
+        }
+
+        /* File Browser Screen */
+        .file-browser {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            background: var(--bg-dark-plus);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-item:active {
+            transform: scale(0.98);
+            background: var(--bg-dark-plus-plus);
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 14px;
+            font-size: 20px;
+        }
+
+        .file-icon.python { background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
+        .file-icon.folder { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .file-icon.json { background: linear-gradient(135deg, #F59E0B, #F97316); }
+        .file-icon.text { background: linear-gradient(135deg, #64748B, #475569); }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .file-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .file-arrow {
+            color: var(--text-muted);
+        }
+
+        /* Terminal Screen */
+        .terminal-screen {
+            background: #000;
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-dark-plus);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .terminal-title {
+            flex: 1;
+            font-size: 14px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .terminal-body {
+            flex: 1;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            overflow-y: auto;
+            color: #E2E8F0;
+        }
+
+        .terminal-line {
+            margin-bottom: 4px;
+        }
+
+        .terminal-prompt {
+            color: var(--success);
+        }
+
+        .terminal-output {
+            color: var(--text-secondary);
+        }
+
+        .terminal-error {
+            color: var(--error);
+        }
+
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.05);
+            border-top: 1px solid var(--border);
+        }
+
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .keyboard-toolbar {
+            display: flex;
+            gap: 8px;
+            padding: 8px 16px 16px;
+            background: var(--bg-dark-plus);
+            overflow-x: auto;
+        }
+
+        .key-btn {
+            padding: 10px 16px;
+            background: var(--bg-dark-plus-plus);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .key-btn:active {
+            background: var(--border);
+        }
+
+        /* AI Assistant Screen */
+        .ai-screen {
+            background: var(--bg-dark);
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-dark-plus);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ai-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .ai-avatar svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .ai-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .ai-info p {
+            font-size: 12px;
+            color: var(--success);
+        }
+
+        .ai-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ai-message {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .ai-message.user {
+            align-self: flex-end;
+            background: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai-message.assistant {
+            align-self: flex-start;
+            background: var(--bg-dark-plus);
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+        }
+
+        .ai-message .code-block {
+            background: var(--bg-dark);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .ai-input-area {
+            padding: 12px 16px;
+            background: var(--bg-dark-plus);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+        }
+
+        .ai-input {
+            flex: 1;
+            padding: 14px 18px;
+            background: var(--bg-dark-plus-plus);
+            border: none;
+            border-radius: 24px;
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+        }
+
+        .ai-send-btn {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .ai-send-btn svg {
+            color: white;
+            width: 22px;
+            height: 22px;
+        }
+
+        /* Settings Screen */
+        .settings-screen {
+            background: var(--bg-dark);
+        }
+
+        .settings-header {
+            padding: 16px;
+            background: var(--bg-dark-plus);
+        }
+
+        .settings-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .settings-section {
+            padding: 16px;
+        }
+
+        .settings-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+
+        .settings-group {
+            background: var(--bg-dark-plus);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .settings-item:not(:last-child) {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-item:active {
+            background: var(--bg-dark-plus-plus);
+        }
+
+        .settings-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 14px;
+        }
+
+        .settings-icon svg {
+            width: 20px;
+            height: 20px;
+            color: white;
+        }
+
+        .settings-icon.blue { background: #3B82F6; }
+        .settings-icon.purple { background: #8B5CF6; }
+        .settings-icon.green { background: #10B981; }
+        .settings-icon.orange { background: #F59E0B; }
+        .settings-icon.red { background: #EF4444; }
+
+        .settings-label {
+            flex: 1;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .settings-value {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-right: 8px;
+        }
+
+        .settings-arrow {
+            color: var(--text-muted);
+        }
+
+        /* Onboarding Screen */
+        .onboarding-screen {
+            background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-dark-plus) 100%);
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .onboarding-content {
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .onboarding-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4);
+        }
+
+        .onboarding-icon svg {
+            width: 60px;
+            height: 60px;
+            color: white;
+        }
+
+        .onboarding-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .onboarding-desc {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .onboarding-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 40px;
+        }
+
+        .onboarding-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+
+        .onboarding-dot.active {
+            background: var(--primary);
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .onboarding-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .onboarding-btn:active {
+            transform: scale(0.98);
+            background: var(--primary-dark);
+        }
+
+        .onboarding-skip {
+            margin-top: 16px;
+            color: var(--text-muted);
+            font-size: 14px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        /* Toast */
+        .toast {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 24px;
+            background: var(--bg-dark-plus-plus);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Tab bar navigation */
+        .tab-nav {
+            display: flex;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-dark-plus);
+            border-top: 1px solid var(--border);
+            padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+        }
+
+        .tab-item svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .tab-item span {
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="dynamic-island"></div>
+        
+        <!-- Editor Screen -->
+        <div id="screen-editor" class="screen active">
+            <div class="nav-bar">
+                <div class="nav-left">
+                    <button class="nav-btn" onclick="showScreen('files')">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                    <span class="nav-title">main.py</span>
+                </div>
+                <div class="nav-right">
+                    <button class="nav-btn">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    </button>
+                    <button class="nav-btn run-btn" onclick="runCode()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="file-tabs">
+                <div class="file-tab active">
+                    main.py
+                    <span class="close">×</span>
+                </div>
+                <div class="file-tab">
+                    utils.py
+                    <span class="close">×</span>
+                </div>
+                <div class="file-tab">
+                    config.json
+                    <span class="close">×</span>
+                </div>
+            </div>
+            
+            <div class="editor-container">
+                <div class="code-editor">
+                    <div class="line-numbers">
+                        1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12
+                    </div>
+                    <div class="code-content">
+<span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np
+<span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt
+<span class="code-keyword">from</span> datetime <span class="code-keyword">import</span> datetime
+
+<span class="code-comment"># 计算 Fibonacci 数列</span>
+<span class="code-keyword">def</span> <span class="code-function">fibonacci</span>(n):
+    <span class="code-keyword">if</span> n <= <span class="code-number">1</span>:
+        <span class="code-keyword">return</span> n
+    <span class="code-keyword">return</span> fibonacci(n-<span class="code-number">1</span>) + fibonacci(n-<span class="code-number">2</span>)
+
+<span class="code-comment"># 绘制 spiral</span>
+<span class="code-keyword">def</span> <span class="code-function">draw_spiral</span>():
+    angles = np.<span class="code-function">linspace</span>(<span class="code-number">0</span>, <span class="code-number">4</span>*np.pi, <span class="code-number">100</span>)
+    r = np.<span class="code-function">linspace</span>(<span class="code-number">1</span>, <span class="code-number">10</span>, <span class="code-number">100</span>)
+    
+    plt.<span class="function">figure</span>(figsize=(<span class="code-number">8</span>, <span class="code-number">6</span>))
+    plt.<span class="function">polar</span>(True)
+    plt.<span class="function">plot</span>(angles, r, <span class="code-string">'b-'</span>, linewidth=<span class="code-number">2</span>)
+    plt.<span class="function">title</span>(<span class="code-string">f' Spiral - {datetime.now().strftime("%Y-%m-%d")}'</span>)
+    plt.<span class="function">show</span>()
+
+<span class="code-keyword">if</span> __name__ == <span class="code-string">"__main__"</span>:
+    <span class="code-function">print</span>(<span class="code-string">"计算 Fibonacci..."</span>)
+    <span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-function">range</span>(<span class="code-number">10</span>):
+        <span class="code-function">print</span>(<span class="code-string">f"fib({i}) = {</span><span class="code-function">fibonacci</span>(i)<span class="code-string">}"</span>)
+    <span class="code-function">draw_spiral</span>()
+                    </div>
+                </div>
+            </div>
+            
+            <div class="output-panel">
+                <div class="output-header">
+                    <div class="output-tabs">
+                        <div class="output-tab active">输出</div>
+                        <div class="output-tab">问题</div>
+                        <div class="output-tab">终端</div>
+                    </div>
+                    <button class="nav-btn" style="width:36px;height:36px;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="output-content">
+                    <span class="success">></span> 计算 Fibonacci...
+                    <br>fib(0) = 0
+                    <br>fib(1) = 1
+                    <br>fib(2) = 1
+                    <br>fib(3) = 2
+                    <br>fib(4) = 3
+                    <br>fib(5) = 5
+                    <br>fib(6) = 8
+                    <br>fib(7) = 13
+                    <br>fib(8) = 21
+                    <br>fib(9) = 34
+                    <br><span class="success">✓ 运行完成，耗时 0.12s</span>
+                </div>
+            </div>
+            
+            <div class="bottom-toolbar">
+                <button class="toolbar-btn" onclick="showScreen('files')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <span>文件</span>
+                </button>
+                <button class="toolbar-btn active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    <span>编辑</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('terminal')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span>终端</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('ai')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    <span>AI</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('settings')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>设置</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- File Browser Screen -->
+        <div id="screen-files" class="screen">
+            <div class="nav-bar">
+                <div class="nav-left">
+                    <button class="nav-btn" onclick="showScreen('editor')">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <span class="nav-title">项目文件</span>
+                </div>
+                <div class="nav-right">
+                    <button class="nav-btn">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    </button>
+                    <button class="nav-btn">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="file-browser">
+                <div class="file-item">
+                    <div class="file-icon folder">📁</div>
+                    <div class="file-info">
+                        <div class="file-name">my_project</div>
+                        <div class="file-meta">文件夹 · 3 个文件</div>
+                    </div>
+                    <div class="file-arrow">›</div>
+                </div>
+                
+                <div class="file-item">
+                    <div class="file-icon python">🐍</div>
+                    <div class="file-info">
+                        <div class="file-name">main.py</div>
+                        <div class="file-meta">Python · 2.4 KB · 刚刚</div>
+                    </div>
+                </div>
+                
+                <div class="file-item">
+                    <div class="file-icon python">🐍</div>
+                    <div class="file-info">
+                        <div class="file-name">utils.py</div>
+                        <div class="file-meta">Python · 1.1 KB · 今天</div>
+                    </div>
+                </div>
+                
+                <div class="file-item">
+                    <div class="file-icon json">📄</div>
+                    <div class="file-info">
+                        <div class="file-name">config.json</div>
+                        <div class="file-meta">JSON · 256 B · 昨天</div>
+                    </div>
+                </div>
+                
+                <div class="file-item">
+                    <div class="file-icon folder">📁</div>
+                    <div class="file-info">
+                        <div class="file-name">data</div>
+                        <div class="file-meta">文件夹 · 5 个文件</div>
+                    </div>
+                    <div class="file-arrow">›</div>
+                </div>
+                
+                <div class="file-item">
+                    <div class="file-icon text">📝</div>
+                    <div class="file-info">
+                        <div class="file-name">README.md</div>
+                        <div class="file-meta">Markdown · 1.8 KB · 3 天前</div>
+                    </div>
+                </div>
+                
+                <div class="file-item">
+                    <div class="file-icon text">📝</div>
+                    <div class="file-info">
+                        <div class="file-name">requirements.txt</div>
+                        <div class="file-meta">Text · 128 B · 1 周前</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bottom-toolbar">
+                <button class="toolbar-btn active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <span>文件</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('editor')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    <span>编辑</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('terminal')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span>终端</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('ai')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    <span>AI</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('settings')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>设置</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Terminal Screen -->
+        <div id="screen-terminal" class="screen terminal-screen">
+            <div class="terminal-header">
+                <span class="terminal-title">Terminal — main.py</span>
+                <button class="nav-btn" onclick="showScreen('editor')" style="background:transparent;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <div class="terminal-body">
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span> <span class="terminal-output">python --version</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">Python 3.11.5</span>
+                </div>
+                <br>
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span> <span class="terminal-output">python main.py</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">计算 Fibonacci...</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">fib(0) = 0</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">fib(1) = 1</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">fib(2) = 1</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">fib(3) = 2</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">fib(4) = 3</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">fib(5) = 5</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">fib(6) = 8</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">fib(7) = 13</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">fib(8) = 21</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-output">fib(9) = 34</span>
+                </div>
+                <br>
+                <div class="terminal-line">
+                    <span class="terminal-success" style="color: var(--success);">✓ 运行完成，耗时 0.12s</span>
+                </div>
+            </div>
+            
+            <div class="terminal-input-line">
+                <span class="terminal-prompt" style="margin-right: 8px;">$</span>
+                <input type="text" class="terminal-input" placeholder="输入命令...">
+            </div>
+            
+            <div class="keyboard-toolbar">
+                <button class="key-btn">python</button>
+                <button class="key-btn">pip</button>
+                <button class="key-btn">ls</button>
+                <button class="key-btn">cd</button>
+                <button class="key-btn">git</button>
+                <button class="key-btn">clear</button>
+                <button class="key-btn">↑</button>
+                <button class="key-btn">↓</button>
+            </div>
+            
+            <div class="bottom-toolbar">
+                <button class="toolbar-btn" onclick="showScreen('files')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <span>文件</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('editor')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    <span>编辑</span>
+                </button>
+                <button class="toolbar-btn active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span>终端</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('ai')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    <span>AI</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('settings')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>设置</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- AI Assistant Screen -->
+        <div id="screen-ai" class="screen ai-screen">
+            <div class="ai-header">
+                <div class="ai-avatar">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </div>
+                <div class="ai-info">
+                    <h3>PyBox AI 助手</h3>
+                    <p>由 DeepSeek 驱动</p>
+                </div>
+                <button class="nav-btn" onclick="showScreen('editor')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            
+            <div class="ai-messages">
+                <div class="ai-message user">
+                    如何优化这段 Fibonacci 代码的性能？
+                </div>
+                <div class="ai-message assistant">
+                    可以使用记忆化（Memoization）来避免重复计算。这是一个经典的空间换时间优化：
+                    <div class="code-block"><span class="code-keyword">from</span> functools <span class="code-keyword">import</span> lru_cache
+
+<span class="code-keyword">@</span>lru_cache(maxsize=<span class="code-keyword">None</span>)
+<span class="code-keyword">def</span> <span class="code-function">fibonacci</span>(n):
+    <span class="code-keyword">if</span> n <= <span class="code-number">1</span>:
+        <span class="code-keyword">return</span> n
+    <span class="code-keyword">return</span> fibonacci(n-<span class="code-number">1</span>) + fibonacci(n-<span class="code-number">2</span>)</div>
+                    <br>
+                    这样可以将时间复杂度从 O(2ⁿ) 降到 O(n)。
+                </div>
+            </div>
+            
+            <div class="ai-input-area">
+                <input type="text" class="ai-input" placeholder="输入问题或选择下方快捷方式">
+                <button class="ai-send-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                </button>
+            </div>
+            
+            <div style="padding: 0 16px 16px; display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="key-btn" style="font-size: 12px;">解释这段代码</button>
+                <button class="key-btn" style="font-size: 12px;">优化性能</button>
+                <button class="key-btn" style="font-size: 12px;">查找 Bug</button>
+                <button class="key-btn" style="font-size: 12px;">添加注释</button>
+            </div>
+            
+            <div class="bottom-toolbar">
+                <button class="toolbar-btn" onclick="showScreen('files')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <span>文件</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('editor')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    <span>编辑</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('terminal')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span>终端</span>
+                </button>
+                <button class="toolbar-btn active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    <span>AI</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('settings')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>设置</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Settings Screen -->
+        <div id="screen-settings" class="screen settings-screen">
+            <div class="settings-header">
+                <h1>设置</h1>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title">Python 环境</div>
+                <div class="settings-group">
+                    <div class="settings-item">
+                        <div class="settings-icon blue">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                        </div>
+                        <span class="settings-label">Python 版本</span>
+                        <span class="settings-value">3.11.5</span>
+                        <span class="settings-arrow">›</span>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-icon green">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        </div>
+                        <span class="settings-label">已安装的包</span>
+                        <span class="settings-value">23 个</span>
+                        <span class="settings-arrow">›</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title">云同步</div>
+                <div class="settings-group">
+                    <div class="settings-item">
+                        <div class="settings-icon purple">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                        </div>
+                        <span class="settings-label">iCloud 同步</span>
+                        <span class="settings-value">已开启</span>
+                        <span class="settings-arrow">›</span>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-icon orange">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        </div>
+                        <span class="settings-label">GitHub 同步</span>
+                        <span class="settings-value">未连接</span>
+                        <span class="settings-arrow">›</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title">外观</div>
+                <div class="settings-group">
+                    <div class="settings-item">
+                        <div class="settings-icon" style="background: linear-gradient(135deg, #1E293B, #0F172A);">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                        </div>
+                        <span class="settings-label">主题</span>
+                        <span class="settings-value">深色</span>
+                        <span class="settings-arrow">›</span>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-icon" style="background: linear-gradient(135deg, #6366F1, #8B5CF6);">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+                        </div>
+                        <span class="settings-label">字体大小</span>
+                        <span class="settings-value">14px</span>
+                        <span class="settings-arrow">›</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <div class="settings-section-title">账户</div>
+                <div class="settings-group">
+                    <div class="settings-item">
+                        <div class="settings-icon" style="background: linear-gradient(135deg, #6366F1, #22D3EE);">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                        </div>
+                        <span class="settings-label">PyBox Pro</span>
+                        <span class="settings-value" style="color: var(--success);">已激活</span>
+                        <span class="settings-arrow">›</span>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-icon red">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        </div>
+                        <span class="settings-label">退出登录</span>
+                        <span class="settings-arrow">›</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px;">
+                PyBox v1.0.0 (Build 2026.06.23)
+            </div>
+            
+            <div class="bottom-toolbar">
+                <button class="toolbar-btn" onclick="showScreen('files')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                    <span>文件</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('editor')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    <span>编辑</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('terminal')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span>终端</span>
+                </button>
+                <button class="toolbar-btn" onclick="showScreen('ai')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    <span>AI</span>
+                </button>
+                <button class="toolbar-btn active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <span>设置</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Toast -->
+        <div id="toast" class="toast">代码已运行</div>
+    </div>
+    
+    <script>
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-' + screenId).classList.add('active');
+        }
+        
+        function runCode() {
+            const toast = document.getElementById('toast');
+            toast.textContent = '↻ 运行中...';
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.textContent = '✓ 运行完成，耗时 0.12s';
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 1500);
+            }, 1000);
+        }
+        
+        // 模拟点击反馈
+        document.querySelectorAll('.file-item, .settings-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.style.opacity = '0.7';
+                setTimeout(() => {
+                    this.style.opacity = '1';
+                }, 100);
+            });
+        });
+        
+        // 底部导航切换高亮
+        document.querySelectorAll('.toolbar-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const parent = this.closest('.bottom-toolbar');
+                parent.querySelectorAll('.toolbar-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

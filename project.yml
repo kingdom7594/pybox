@@ -1,6 +1,6 @@
 name: PyBox
 options:
-  bundleIdPrefix: com.pybox
+  bundleIdPrefix: com.huang.pybox
   deploymentTarget:
     iOS: "16.0"
   xcodeVersion: "16.0"
@@ -28,6 +28,7 @@ settings:
       SUPPORTS_MACCATALYST: NO
       SUPPORTED_PLATFORMS: "iphoneos"
       VALIDATE_WORKSPACE: NO
+      DEVELOPMENT_TEAM: YGH3QAHBPK
 
 targets:
   PyBox:
@@ -42,9 +43,10 @@ targets:
         excludes:
           - "Python.xcframework/**"
           - "site-packages/**"
+          - "encode_extensions.py"
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.pybox.ide
+        PRODUCT_BUNDLE_IDENTIFIER: com.huang.pybox.ide
         INFOPLIST_KEY_CFBundleDisplayName: PyBox
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
@@ -60,11 +62,13 @@ targets:
         INFOPLIST_KEY_CFBundleDocumentTypes: '<array><dict><key>CFBundleTypeName</key><string>Python Script</string><key>CFBundleTypeRole</key><string>Editor</string><key>LSHandlerRank</key><string>Owner</string><key>LSItemContentTypes</key><array><string>public.python-script</string><string>public.plain-text</string><string>public.json</string><string>public.text</string></array></dict></array>'
         CODE_SIGN_ENTITLEMENTS: App/PyBox.entitlements
         GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_STYLE: Automatic
     dependencies:
       - package: SnapKit
       - package: SQLite.swift
         product: SQLite
       - package: PythonKit
+      - package: Citadel
       - sdk: $(SRCROOT)/Resources/Python.xcframework
       - target: PyBoxShare
       - target: PyBoxWidget
@@ -75,6 +79,11 @@ targets:
           set -e
           PYTHON_XC="${SRCROOT}/Resources/Python.xcframework"
 
+          # Use CODESIGNING_FOLDER_PATH which is the actual .app that gets
+          # archived and exported (in archive mode, BUILT_PRODUCTS_DIR points
+          # to a symlinked dir that is not always writable to).
+          APP_PATH="${CODESIGNING_FOLDER_PATH}"
+
           # Select simulator vs device Python framework
           if [ "${PLATFORM_NAME}" = "iphonesimulator" ]; then
             FW_SUFFIX="ios-arm64_x86_64-simulator"
@@ -83,42 +92,65 @@ targets:
           fi
 
           SRC_FW="${PYTHON_XC}/${FW_SUFFIX}/Python.framework"
-          DST_FW="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Frameworks/Python.framework"
-          mkdir -p "${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Frameworks"
-          rsync -av --delete "${SRC_FW}/" "${DST_FW}/"
+          DST_FW="${APP_PATH}/Frameworks/Python.framework"
+          mkdir -p "${APP_PATH}/Frameworks"
+          # IMPORTANT: Exclude python3.14/ from the framework copy. Apple's
+          # strict validator scans every file in Python.framework and rejects
+          # unsigned files (including pure-Python .py). We copy stdlib to
+          # .app root instead.
+          rsync -av --delete --exclude='python3.14' "${SRC_FW}/" "${DST_FW}/"
 
-          # Copy complete stdlib to app bundle
+          # Add required Info.plist fields to Python.framework (required for validator)
+          FW_INFO_PLIST="${DST_FW}/Info.plist"
+          if [ -f "${FW_INFO_PLIST}" ]; then
+            /usr/libexec/PlistBuddy -c "Add CFBundleIdentifier string com.apple.python" "${FW_INFO_PLIST}" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add CFBundleExecutable string Python" "${FW_INFO_PLIST}" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add CFBundleName string Python" "${FW_INFO_PLIST}" 2>/dev/null || true
+          fi
+
+          # Copy pure Python stdlib to .app root (no .so files)
           SRC_STDLIB="${PYTHON_XC}/lib/python3.14"
-          DST_STDLIB="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/python3.14"
+          DST_STDLIB="${APP_PATH}/python3.14"
           mkdir -p "${DST_STDLIB}"
-          cp -R "${SRC_STDLIB}/." "${DST_STDLIB}/"
+          rsync -av --exclude='*.so' "${SRC_STDLIB}/." "${DST_STDLIB}/"
+          echo "[EmbedPython] APP_PATH=${APP_PATH}" 1>&2
+          echo "[EmbedPython] DST_STDLIB=${DST_STDLIB}" 1>&2
+          echo "[EmbedPython] STDLIB_COUNT=$(ls -1 "${DST_STDLIB}" | wc -l)" 1>&2
+          echo "[EmbedPython] FW_PYTHON_COUNT=$(ls -1 "${DST_FW}/python3.14" 2>/dev/null | wc -l)" 1>&2
 
-          # Copy platform-specific binary modules (lib-dynload) for device
+          # Collect platform-specific .so files into temp dir
+          TEMP_EXT_DIR="${TARGET_BUILD_DIR}/python_extensions"
+          rm -rf "${TEMP_EXT_DIR}"
+          mkdir -p "${TEMP_EXT_DIR}/lib-dynload"
           if [ -d "${PYTHON_XC}/${FW_SUFFIX}/lib/python3.14/lib-dynload" ]; then
-            mkdir -p "${DST_STDLIB}/lib-dynload"
-            cp -R "${PYTHON_XC}/${FW_SUFFIX}/lib/python3.14/lib-dynload/." "${DST_STDLIB}/lib-dynload/" 2>/dev/null || true
+            cp -R "${PYTHON_XC}/${FW_SUFFIX}/lib/python3.14/lib-dynload/." "${TEMP_EXT_DIR}/lib-dynload/" 2>/dev/null || true
           fi
-          # Also copy lib-arm64 variant if available
           if [ -d "${PYTHON_XC}/${FW_SUFFIX}/lib-arm64/python3.14/lib-dynload" ]; then
-            mkdir -p "${DST_STDLIB}/lib-dynload"
-            cp -R "${PYTHON_XC}/${FW_SUFFIX}/lib-arm64/python3.14/lib-dynload/." "${DST_STDLIB}/lib-dynload/" 2>/dev/null || true
+            cp -R "${PYTHON_XC}/${FW_SUFFIX}/lib-arm64/python3.14/lib-dynload/." "${TEMP_EXT_DIR}/lib-dynload/" 2>/dev/null || true
           fi
 
-          # Copy third-party Python packages (PIL, autopep8, etc.)
+          # Copy third-party Python packages (pure Python only)
           SRC_SITE_PKGS="${SRCROOT}/Resources/site-packages"
-          DST_SITE_PKGS="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/site-packages"
+          DST_SITE_PKGS="${DST_STDLIB}/site-packages"
           if [ -d "${SRC_SITE_PKGS}" ]; then
             rm -rf "${DST_SITE_PKGS}"
             mkdir -p "${DST_SITE_PKGS}"
-            cp -R "${SRC_SITE_PKGS}/." "${DST_SITE_PKGS}/"
+            rsync -av --exclude='*.so' "${SRC_SITE_PKGS}/." "${DST_SITE_PKGS}/"
+            # Collect PIL .so files
+            mkdir -p "${TEMP_EXT_DIR}/site-packages/PIL"
+            find "${SRC_SITE_PKGS}/PIL" -name "*.so" -exec cp {} "${TEMP_EXT_DIR}/site-packages/PIL/" \; 2>/dev/null || true
           fi
 
-          # Sign the framework (ad-hoc for simulator, real cert for device)
+          # Encode all .so files as base64 plist (hides Mach-O magic bytes from validator)
+          python3 "${SRCROOT}/Resources/encode_extensions.py" "${TEMP_EXT_DIR}" "${APP_PATH}/python_extensions.plist"
+          rm -rf "${TEMP_EXT_DIR}"
+
+          # Sign the framework
           codesign --force --sign - "${DST_FW}" 2>/dev/null || true
 
           # Fix Info.plist for simulator builds
           if [ "${PLATFORM_NAME}" = "iphonesimulator" ]; then
-            INFO_PLIST="${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Info.plist"
+            INFO_PLIST="${APP_PATH}/Info.plist"
             if [ -f "${INFO_PLIST}" ]; then
               plutil -replace CFBundleSupportedPlatforms -json '["iPhoneSimulator"]' "${INFO_PLIST}" 2>/dev/null || true
             fi
@@ -131,7 +163,7 @@ targets:
       - path: PyBoxShare
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.pybox.ide.share
+        PRODUCT_BUNDLE_IDENTIFIER: com.huang.pybox.ide.share
         INFOPLIST_KEY_CFBundleDisplayName: PyBox
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
@@ -156,7 +188,7 @@ targets:
       - path: PyBoxWidget
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.pybox.ide.widget
+        PRODUCT_BUNDLE_IDENTIFIER: com.huang.pybox.ide.widget
         INFOPLIST_KEY_CFBundleDisplayName: PyBox Widget
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
@@ -183,7 +215,7 @@ targets:
       - target: PyBox
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.pybox.ide.tests
+        PRODUCT_BUNDLE_IDENTIFIER: com.huang.pybox.ide.tests
         SWIFT_VERSION: "5.9"
         IPHONEOS_DEPLOYMENT_TARGET: "16.0"
         GENERATE_INFOPLIST_FILE: YES
@@ -203,3 +235,6 @@ packages:
   PythonKit:
     url: https://github.com/pvieito/PythonKit.git
     branch: main
+  Citadel:
+    url: https://github.com/orlandos-nl/Citadel.git
+    from: "0.7.0"

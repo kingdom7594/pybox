@@ -39,7 +39,7 @@ struct PyBoxProvider: TimelineProvider {
     // MARK: - Data Loading
 
     private func loadProjects() -> [WidgetProject] {
-        guard let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.pybox.ide") else {
+        guard let containerURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.huang.pybox.ide") else {
             return []
         }
         let fileURL = containerURL.appendingPathComponent("Library/Preferences/recent_projects.json")
@@ -51,7 +51,7 @@ struct PyBoxProvider: TimelineProvider {
     }
 
     private func loadLastOutput() -> String {
-        let defaults = UserDefaults(suiteName: "group.com.pybox.ide")
+        let defaults = UserDefaults(suiteName: "group.com.huang.pybox.ide")
         return defaults?.string(forKey: "last_output") ?? ""
     }
 }

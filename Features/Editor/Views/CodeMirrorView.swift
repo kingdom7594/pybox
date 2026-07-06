@@ -13,8 +13,9 @@ struct CodeMirrorView: UIViewRepresentable {
         
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.isOpaque = false
-        webView.backgroundColor = UIColor(hex: "#1E1E1E")
-        webView.scrollView.backgroundColor = UIColor(hex: "#1E1E1E")
+        webView.backgroundColor = UIColor(Theme.Colors.codeBg)
+        webView.scrollView.backgroundColor = UIColor(Theme.Colors.codeBg)
+        webView.isOpaque = true
         webView.scrollView.showsHorizontalScrollIndicator = false
         webView.scrollView.bounces = true
         webView.scrollView.alwaysBounceVertical = true

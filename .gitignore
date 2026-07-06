@@ -33,3 +33,14 @@ __pycache__/
 *.egg-info/
 dist/
 *.whl
+
+# Test screenshots & prototype exports
+test-screenshots/
+proto2-*.png
+prototype-*.png
+.playwright-mcp/
+Build *.txt
+
+# SPM
+.build/
+Package.resolved

@@ -1,0 +1,3842 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PythonIDE — iOS 皮肤系统 + 订阅</title>
+<style>
+/* ===== 7 色板 × 2 模式 = 14 套主题 =====
+   data-theme 控制色相（emerald/ocean/...）
+   data-mode 控制明暗（dark/light）
+   两组属性都设置在 #app 上，子元素通过 CSS 继承获取对应 token
+   每个组合独立声明全套变量，避免跨元素 var() 计算链断裂 */
+
+[data-mode="dark"] { color-scheme: dark; }
+[data-mode="light"] { color-scheme: light; }
+
+/* ===== Emerald (Python Green) ===== */
+[data-theme="emerald"][data-mode="dark"] {
+  --bg: oklch(12% 0.01 150);
+  --surface: oklch(16% 0.012 150);
+  --surface2: oklch(20% 0.015 150);
+  --surface3: oklch(24% 0.018 150);
+  --fg: oklch(93% 0.005 90);
+  --muted: oklch(55% 0.01 90);
+  --muted2: oklch(42% 0.008 90);
+  --border: oklch(26% 0.01 150);
+  --border2: oklch(30% 0.012 150);
+  --accent: oklch(0.62 0.18 150);
+  --accent2: oklch(0.52 0.18 150);
+  --accent-dim: oklch(0.35 0.18 150 / 0.3);
+  --success: oklch(0.65 0.18 145);
+  --warn: oklch(0.72 0.16 85);
+  --danger: oklch(0.60 0.20 25);
+  --key: oklch(0.72 0.14 300);
+  --fn: oklch(0.72 0.12 210);
+  --str: oklch(0.68 0.14 145);
+  --com: oklch(0.48 0.02 240);
+  --num: oklch(0.72 0.14 40);
+  --bui: oklch(0.68 0.10 180);
+  --dec: oklch(0.68 0.12 280);
+  --tab-bar-bg: oklch(15% 0.012 150);
+  --code-bg: oklch(8% 0.005 250);
+}
+[data-theme="emerald"][data-mode="light"] {
+  --bg: oklch(98% 0.008 150);
+  --surface: oklch(100% 0 0);
+  --surface2: oklch(96% 0.012 150);
+  --surface3: oklch(92% 0.015 150);
+  --fg: oklch(22% 0.015 150);
+  --muted: oklch(48% 0.015 150);
+  --muted2: oklch(62% 0.012 150);
+  --border: oklch(88% 0.012 150);
+  --border2: oklch(82% 0.015 150);
+  --accent: oklch(0.52 0.18 150);
+  --accent2: oklch(0.42 0.18 150);
+  --accent-dim: oklch(0.52 0.18 150 / 0.15);
+  --success: oklch(0.50 0.18 145);
+  --warn: oklch(0.60 0.16 85);
+  --danger: oklch(0.52 0.20 25);
+  --key: oklch(0.50 0.16 300);
+  --fn: oklch(0.50 0.14 210);
+  --str: oklch(0.46 0.16 145);
+  --com: oklch(60% 0.015 240);
+  --num: oklch(0.50 0.16 40);
+  --bui: oklch(0.48 0.12 180);
+  --dec: oklch(0.48 0.14 280);
+  --tab-bar-bg: oklch(97% 0.01 150);
+  --code-bg: oklch(8% 0.008 150);
+}
+
+/* ===== Ocean Blue ===== */
+[data-theme="ocean"][data-mode="dark"] {
+  --bg: oklch(11% 0.015 240);
+  --surface: oklch(15% 0.018 240);
+  --surface2: oklch(19% 0.02 240);
+  --surface3: oklch(23% 0.022 240);
+  --fg: oklch(94% 0.005 240);
+  --muted: oklch(56% 0.01 240);
+  --muted2: oklch(43% 0.008 240);
+  --border: oklch(25% 0.015 240);
+  --border2: oklch(29% 0.018 240);
+  --accent: oklch(0.60 0.22 240);
+  --accent2: oklch(0.50 0.22 240);
+  --accent-dim: oklch(0.33 0.22 240 / 0.3);
+  --success: oklch(0.62 0.18 160);
+  --warn: oklch(0.70 0.16 90);
+  --danger: oklch(0.58 0.22 350);
+  --key: oklch(0.72 0.14 280);
+  --fn: oklch(0.72 0.14 230);
+  --str: oklch(0.66 0.14 160);
+  --com: oklch(0.48 0.02 240);
+  --num: oklch(0.72 0.14 30);
+  --bui: oklch(0.68 0.08 200);
+  --dec: oklch(0.68 0.12 270);
+  --tab-bar-bg: oklch(14% 0.018 240);
+  --code-bg: oklch(8% 0.005 250);
+}
+[data-theme="ocean"][data-mode="light"] {
+  --bg: oklch(98% 0.01 240);
+  --surface: oklch(100% 0 0);
+  --surface2: oklch(96% 0.015 240);
+  --surface3: oklch(92% 0.018 240);
+  --fg: oklch(22% 0.018 240);
+  --muted: oklch(48% 0.018 240);
+  --muted2: oklch(62% 0.015 240);
+  --border: oklch(88% 0.015 240);
+  --border2: oklch(82% 0.018 240);
+  --accent: oklch(0.50 0.22 240);
+  --accent2: oklch(0.40 0.22 240);
+  --accent-dim: oklch(0.50 0.22 240 / 0.15);
+  --success: oklch(0.50 0.18 160);
+  --warn: oklch(0.58 0.16 90);
+  --danger: oklch(0.50 0.22 350);
+  --key: oklch(0.50 0.16 280);
+  --fn: oklch(0.50 0.16 230);
+  --str: oklch(0.46 0.16 160);
+  --com: oklch(60% 0.018 240);
+  --num: oklch(0.50 0.16 30);
+  --bui: oklch(0.48 0.12 200);
+  --dec: oklch(0.48 0.14 270);
+  --tab-bar-bg: oklch(97% 0.012 240);
+  --code-bg: oklch(8% 0.005 250);
+}
+
+/* ===== Lilac Purple ===== */
+[data-theme="lilac"][data-mode="dark"] {
+  --bg: oklch(12% 0.02 280);
+  --surface: oklch(16% 0.022 280);
+  --surface2: oklch(20% 0.025 280);
+  --surface3: oklch(24% 0.028 280);
+  --fg: oklch(93% 0.008 280);
+  --muted: oklch(55% 0.015 280);
+  --muted2: oklch(42% 0.012 280);
+  --border: oklch(26% 0.02 280);
+  --border2: oklch(30% 0.022 280);
+  --accent: oklch(0.60 0.20 290);
+  --accent2: oklch(0.50 0.20 290);
+  --accent-dim: oklch(0.33 0.20 290 / 0.3);
+  --success: oklch(0.62 0.18 150);
+  --warn: oklch(0.70 0.16 80);
+  --danger: oklch(0.58 0.20 20);
+  --key: oklch(0.72 0.14 310);
+  --fn: oklch(0.70 0.12 220);
+  --str: oklch(0.66 0.14 150);
+  --com: oklch(0.48 0.02 260);
+  --num: oklch(0.70 0.14 35);
+  --bui: oklch(0.66 0.10 185);
+  --dec: oklch(0.68 0.12 285);
+  --tab-bar-bg: oklch(15% 0.022 280);
+  --code-bg: oklch(8% 0.005 250);
+}
+[data-theme="lilac"][data-mode="light"] {
+  --bg: oklch(98% 0.015 280);
+  --surface: oklch(100% 0 0);
+  --surface2: oklch(96% 0.018 280);
+  --surface3: oklch(92% 0.022 280);
+  --fg: oklch(22% 0.02 280);
+  --muted: oklch(48% 0.02 280);
+  --muted2: oklch(62% 0.018 280);
+  --border: oklch(88% 0.018 280);
+  --border2: oklch(82% 0.022 280);
+  --accent: oklch(0.50 0.20 290);
+  --accent2: oklch(0.40 0.20 290);
+  --accent-dim: oklch(0.50 0.20 290 / 0.15);
+  --success: oklch(0.50 0.18 150);
+  --warn: oklch(0.58 0.16 80);
+  --danger: oklch(0.50 0.20 20);
+  --key: oklch(0.50 0.16 310);
+  --fn: oklch(0.50 0.14 220);
+  --str: oklch(0.46 0.16 150);
+  --com: oklch(60% 0.018 260);
+  --num: oklch(0.50 0.16 35);
+  --bui: oklch(0.48 0.12 185);
+  --dec: oklch(0.48 0.14 285);
+  --tab-bar-bg: oklch(97% 0.015 280);
+  --code-bg: oklch(8% 0.005 250);
+}
+
+/* ===== Sunset Orange ===== */
+[data-theme="sunset"][data-mode="dark"] {
+  --bg: oklch(13% 0.015 60);
+  --surface: oklch(17% 0.018 60);
+  --surface2: oklch(21% 0.02 60);
+  --surface3: oklch(25% 0.022 60);
+  --fg: oklch(93% 0.008 60);
+  --muted: oklch(55% 0.015 60);
+  --muted2: oklch(42% 0.012 60);
+  --border: oklch(27% 0.018 60);
+  --border2: oklch(31% 0.02 60);
+  --accent: oklch(0.62 0.18 65);
+  --accent2: oklch(0.50 0.18 65);
+  --accent-dim: oklch(0.34 0.18 65 / 0.3);
+  --success: oklch(0.62 0.18 145);
+  --warn: oklch(0.68 0.18 60);
+  --danger: oklch(0.58 0.22 15);
+  --key: oklch(0.70 0.14 295);
+  --fn: oklch(0.70 0.12 215);
+  --str: oklch(0.66 0.14 140);
+  --com: oklch(0.48 0.02 250);
+  --num: oklch(0.70 0.14 30);
+  --bui: oklch(0.66 0.10 180);
+  --dec: oklch(0.68 0.12 275);
+  --tab-bar-bg: oklch(16% 0.018 60);
+  --code-bg: oklch(8% 0.005 250);
+}
+[data-theme="sunset"][data-mode="light"] {
+  --bg: oklch(98% 0.012 60);
+  --surface: oklch(100% 0 0);
+  --surface2: oklch(96% 0.018 60);
+  --surface3: oklch(92% 0.022 60);
+  --fg: oklch(25% 0.018 60);
+  --muted: oklch(50% 0.018 60);
+  --muted2: oklch(64% 0.015 60);
+  --border: oklch(88% 0.018 60);
+  --border2: oklch(82% 0.022 60);
+  --accent: oklch(0.55 0.18 60);
+  --accent2: oklch(0.45 0.18 60);
+  --accent-dim: oklch(0.55 0.18 60 / 0.15);
+  --success: oklch(0.50 0.18 145);
+  --warn: oklch(0.55 0.18 60);
+  --danger: oklch(0.50 0.22 15);
+  --key: oklch(0.50 0.16 295);
+  --fn: oklch(0.50 0.14 215);
+  --str: oklch(0.46 0.16 140);
+  --com: oklch(60% 0.018 250);
+  --num: oklch(0.50 0.16 30);
+  --bui: oklch(0.48 0.12 180);
+  --dec: oklch(0.48 0.14 275);
+  --tab-bar-bg: oklch(97% 0.015 60);
+  --code-bg: oklch(8% 0.005 250);
+}
+
+/* ===== Rose Pink ===== */
+[data-theme="rose"][data-mode="dark"] {
+  --bg: oklch(13% 0.02 350);
+  --surface: oklch(17% 0.022 350);
+  --surface2: oklch(21% 0.025 350);
+  --surface3: oklch(25% 0.028 350);
+  --fg: oklch(93% 0.008 350);
+  --muted: oklch(55% 0.015 350);
+  --muted2: oklch(42% 0.012 350);
+  --border: oklch(27% 0.02 350);
+  --border2: oklch(31% 0.022 350);
+  --accent: oklch(0.62 0.20 345);
+  --accent2: oklch(0.50 0.20 345);
+  --accent-dim: oklch(0.34 0.20 345 / 0.3);
+  --success: oklch(0.62 0.18 150);
+  --warn: oklch(0.68 0.16 85);
+  --danger: oklch(0.60 0.22 10);
+  --key: oklch(0.70 0.14 320);
+  --fn: oklch(0.70 0.12 225);
+  --str: oklch(0.66 0.14 155);
+  --com: oklch(0.48 0.02 260);
+  --num: oklch(0.70 0.14 40);
+  --bui: oklch(0.66 0.10 190);
+  --dec: oklch(0.68 0.12 285);
+  --tab-bar-bg: oklch(16% 0.022 350);
+  --code-bg: oklch(8% 0.005 250);
+}
+[data-theme="rose"][data-mode="light"] {
+  --bg: oklch(98% 0.015 350);
+  --surface: oklch(100% 0 0);
+  --surface2: oklch(96% 0.02 350);
+  --surface3: oklch(92% 0.025 350);
+  --fg: oklch(25% 0.02 350);
+  --muted: oklch(50% 0.02 350);
+  --muted2: oklch(64% 0.018 350);
+  --border: oklch(88% 0.02 350);
+  --border2: oklch(82% 0.025 350);
+  --accent: oklch(0.55 0.20 345);
+  --accent2: oklch(0.45 0.20 345);
+  --accent-dim: oklch(0.55 0.20 345 / 0.15);
+  --success: oklch(0.50 0.18 150);
+  --warn: oklch(0.55 0.16 85);
+  --danger: oklch(0.50 0.22 10);
+  --key: oklch(0.50 0.16 320);
+  --fn: oklch(0.50 0.14 225);
+  --str: oklch(0.46 0.16 155);
+  --com: oklch(60% 0.018 260);
+  --num: oklch(0.50 0.16 40);
+  --bui: oklch(0.48 0.12 190);
+  --dec: oklch(0.48 0.14 285);
+  --tab-bar-bg: oklch(97% 0.018 350);
+  --code-bg: oklch(8% 0.005 250);
+}
+
+/* ===== Teal Wave ===== */
+[data-theme="teal"][data-mode="dark"] {
+  --bg: oklch(11% 0.015 190);
+  --surface: oklch(15% 0.018 190);
+  --surface2: oklch(19% 0.02 190);
+  --surface3: oklch(23% 0.022 190);
+  --fg: oklch(93% 0.005 190);
+  --muted: oklch(55% 0.01 190);
+  --muted2: oklch(42% 0.008 190);
+  --border: oklch(25% 0.015 190);
+  --border2: oklch(29% 0.018 190);
+  --accent: oklch(0.62 0.18 190);
+  --accent2: oklch(0.50 0.18 190);
+  --accent-dim: oklch(0.34 0.18 190 / 0.3);
+  --success: oklch(0.63 0.18 155);
+  --warn: oklch(0.68 0.16 90);
+  --danger: oklch(0.58 0.20 30);
+  --key: oklch(0.70 0.14 305);
+  --fn: oklch(0.70 0.12 220);
+  --str: oklch(0.66 0.14 150);
+  --com: oklch(0.48 0.02 250);
+  --num: oklch(0.70 0.14 35);
+  --bui: oklch(0.66 0.10 185);
+  --dec: oklch(0.68 0.12 280);
+  --tab-bar-bg: oklch(14% 0.018 190);
+  --code-bg: oklch(8% 0.005 250);
+}
+[data-theme="teal"][data-mode="light"] {
+  --bg: oklch(98% 0.012 190);
+  --surface: oklch(100% 0 0);
+  --surface2: oklch(96% 0.018 190);
+  --surface3: oklch(92% 0.022 190);
+  --fg: oklch(22% 0.018 190);
+  --muted: oklch(48% 0.018 190);
+  --muted2: oklch(62% 0.015 190);
+  --border: oklch(88% 0.018 190);
+  --border2: oklch(82% 0.022 190);
+  --accent: oklch(0.50 0.18 190);
+  --accent2: oklch(0.40 0.18 190);
+  --accent-dim: oklch(0.50 0.18 190 / 0.15);
+  --success: oklch(0.50 0.18 155);
+  --warn: oklch(0.55 0.16 90);
+  --danger: oklch(0.50 0.20 30);
+  --key: oklch(0.50 0.16 305);
+  --fn: oklch(0.50 0.14 220);
+  --str: oklch(0.46 0.16 150);
+  --com: oklch(60% 0.018 250);
+  --num: oklch(0.50 0.16 35);
+  --bui: oklch(0.48 0.12 185);
+  --dec: oklch(0.48 0.14 280);
+  --tab-bar-bg: oklch(97% 0.012 190);
+  --code-bg: oklch(8% 0.005 250);
+}
+
+/* ===== Graphite ===== */
+[data-theme="graphite"][data-mode="dark"] {
+  --bg: oklch(12% 0.002 250);
+  --surface: oklch(16% 0.003 250);
+  --surface2: oklch(20% 0.004 250);
+  --surface3: oklch(24% 0.005 250);
+  --fg: oklch(92% 0.002 250);
+  --muted: oklch(54% 0.003 250);
+  --muted2: oklch(41% 0.003 250);
+  --border: oklch(26% 0.004 250);
+  --border2: oklch(30% 0.005 250);
+  --accent: oklch(0.65 0.04 250);
+  --accent2: oklch(0.55 0.04 250);
+  --accent-dim: oklch(0.38 0.04 250 / 0.25);
+  --success: oklch(0.62 0.06 145);
+  --warn: oklch(0.68 0.06 80);
+  --danger: oklch(0.58 0.06 20);
+  --key: oklch(0.70 0.06 300);
+  --fn: oklch(0.70 0.05 220);
+  --str: oklch(0.66 0.06 150);
+  --com: oklch(0.48 0.02 250);
+  --num: oklch(0.70 0.05 40);
+  --bui: oklch(0.66 0.04 180);
+  --dec: oklch(0.66 0.05 280);
+  --tab-bar-bg: oklch(15% 0.003 250);
+  --code-bg: oklch(8% 0.005 250);
+}
+[data-theme="graphite"][data-mode="light"] {
+  --bg: oklch(97% 0.003 250);
+  --surface: oklch(100% 0 0);
+  --surface2: oklch(95% 0.004 250);
+  --surface3: oklch(91% 0.005 250);
+  --fg: oklch(20% 0.004 250);
+  --muted: oklch(46% 0.004 250);
+  --muted2: oklch(60% 0.003 250);
+  --border: oklch(87% 0.005 250);
+  --border2: oklch(80% 0.006 250);
+  --accent: oklch(0.40 0.05 250);
+  --accent2: oklch(0.30 0.05 250);
+  --accent-dim: oklch(0.40 0.05 250 / 0.12);
+  --success: oklch(0.46 0.10 145);
+  --warn: oklch(0.52 0.12 80);
+  --danger: oklch(0.48 0.15 20);
+  --key: oklch(0.48 0.10 300);
+  --fn: oklch(0.46 0.08 220);
+  --str: oklch(0.44 0.10 150);
+  --com: oklch(58% 0.005 250);
+  --num: oklch(0.46 0.10 40);
+  --bui: oklch(0.44 0.08 180);
+  --dec: oklch(0.44 0.08 280);
+  --tab-bar-bg: oklch(96% 0.003 250);
+  --code-bg: oklch(8% 0.005 250);
+}
+
+/* ===== :root defaults (fallback for elements outside #app) =====
+   默认 Light Mode + Emerald 色板，匹配 iOS 系统行为 */
+:root {
+  color-scheme: light;
+  --bg: oklch(98% 0.008 150);
+  --surface: oklch(100% 0 0);
+  --surface2: oklch(96% 0.012 150);
+  --surface3: oklch(92% 0.015 150);
+  --fg: oklch(22% 0.015 150);
+  --muted: oklch(48% 0.015 150);
+  --muted2: oklch(62% 0.012 150);
+  --border: oklch(88% 0.012 150);
+  --border2: oklch(82% 0.015 150);
+  --accent: oklch(0.52 0.18 150);
+  --accent2: oklch(0.42 0.18 150);
+  --accent-dim: oklch(0.52 0.18 150 / 0.15);
+  --success: oklch(0.50 0.18 145);
+  --warn: oklch(0.60 0.16 85);
+  --danger: oklch(0.52 0.20 25);
+  --key: oklch(0.50 0.16 300);
+  --fn: oklch(0.50 0.14 210);
+  --str: oklch(0.46 0.16 145);
+  --com: oklch(60% 0.015 240);
+  --num: oklch(0.50 0.16 40);
+  --bui: oklch(0.48 0.12 180);
+  --dec: oklch(0.48 0.14 280);
+  --tab-bar-bg: oklch(97% 0.01 150);
+  --code-bg: oklch(8% 0.008 150);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --tab-h: 50px;
+  --nav-h: 52px;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body {
+  width: 100%; min-height: 100%;
+  background: var(--bg);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  display: flex; justify-content: center; align-items: center;
+  padding: 20px; color: var(--fg);
+}
+.phone-frame {
+  width: 390px; height: 844px;
+  background: var(--bg);
+  border-radius: 48px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 0 1px oklch(35% 0.01 250), 0 40px 80px rgba(0,0,0,0.6), 0 10px 24px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+}
+.dynamic-island {
+  position: absolute; top: 11px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 34px;
+  background: #000; border-radius: 20px; z-index: 250;
+}
+.status-bar {
+  position: absolute; top: 0; left: 0; right: 0; height: 54px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 8px 28px 6px; z-index: 200; pointer-events: none;
+  font-size: 14px; font-weight: 590; letter-spacing: 0.01em; color: var(--fg);
+}
+.status-bar .s-icons { display: flex; gap: 6px; align-items: center; }
+.status-bar .s-icons svg { width: 16px; height: 16px; }
+.home-indicator {
+  position: absolute; bottom: 6px; left: 50%;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: oklch(38% 0.01 250); border-radius: 3px; z-index: 250;
+}
+
+.screen { display: none; height: 100%; flex-direction: column; padding-top: 54px; position: relative; }
+.screen.active { display: flex; }
+.tab-bar {
+  display: flex; background: var(--tab-bar-bg);
+  border-top: 1px solid var(--border);
+  padding: 4px 8px calc(4px + env(safe-area-inset-bottom, 0px));
+  flex-shrink: 0; position: absolute; bottom: 0; left: 0; right: 0; z-index: 100;
+}
+.tab-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 1px; padding: 4px; background: none; border: none;
+  cursor: pointer; color: var(--muted2); transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent; font-family: var(--font-body);
+  position: relative;
+}
+.tab-item.active { color: var(--accent); }
+.tab-item svg { width: 24px; height: 24px; }
+.tab-item span { font-size: 10px; letter-spacing: 0.02em; font-weight: 500; }
+.tab-badge {
+  position: absolute; top: 0; right: 50%; margin-right: -18px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--danger);
+}
+.nav-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; min-height: var(--nav-h);
+}
+.nav-left, .nav-right { display: flex; align-items: center; gap: 8px; }
+.nav-title { font-size: 17px; font-weight: 590; letter-spacing: -0.02em; }
+.nav-btn {
+  width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-md); background: var(--surface2);
+  color: var(--fg); border: none; cursor: pointer; transition: background 0.15s;
+}
+.nav-btn:active { background: var(--border); }
+.nav-btn svg { width: 20px; height: 20px; }
+.run-btn { background: var(--accent); color: #000; }
+.run-btn:active { background: var(--accent2); }
+.editor-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.file-tabs {
+  display: flex; background: var(--surface); padding: 8px 8px 0;
+  gap: 2px; flex-shrink: 0; overflow-x: auto;
+}
+.file-tab {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 12px; background: var(--surface2);
+  border-radius: 8px 8px 0 0; color: var(--muted);
+  font-family: var(--font-mono); font-size: 11.5px; white-space: nowrap;
+  cursor: pointer; flex-shrink: 0; transition: color 0.15s, background 0.15s;
+  border: 1px solid transparent; border-bottom: none;
+}
+.file-tab.active {
+  background: var(--bg); color: var(--fg);
+  border-color: var(--border);
+}
+.file-tab .f-icon { width: 14px; height: 14px; flex-shrink: 0; }
+.file-tab .f-close {
+  width: 16px; height: 16px; display: grid; place-items: center;
+  border-radius: 4px; opacity: 0; cursor: pointer; transition: opacity 0.15s;
+  font-size: 13px; line-height: 1; color: var(--muted);
+}
+.file-tab:hover .f-close { opacity: 0.5; }
+.file-tab .f-close:hover { opacity: 1; background: rgba(255,255,255,0.06); }
+.code-area {
+  flex: 1; display: flex; overflow: auto;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.7;
+  position: relative;
+}
+.line-nums {
+  width: 48px; flex-shrink: 0; text-align: right;
+  padding: 16px 10px 16px 8px; color: var(--muted2);
+  user-select: none; line-height: 1.7; font-size: 13px;
+}
+.code-wrap {
+  flex: 1; padding: 16px 16px 16px 0;
+  white-space: pre; overflow-x: auto;
+  line-height: 1.7; font-size: 13px; tab-size: 4;
+  color: var(--fg);
+}
+.code-wrap .kw { color: var(--key); }
+.code-wrap .fn { color: var(--fn); }
+.code-wrap .str { color: var(--str); }
+.code-wrap .com { color: var(--com); font-style: italic; }
+.code-wrap .num { color: var(--num); }
+.code-wrap .bui { color: var(--bui); }
+.code-wrap .dec { color: var(--dec); }
+.code-wrap .self { color: var(--dec); }
+.split-toggle {
+  position: absolute; bottom: 4px; right: 4px;
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--surface2); border: 1px solid var(--border);
+  display: grid; place-items: center; cursor: pointer;
+  z-index: 20; transition: background 0.15s;
+}
+.split-toggle:active { background: var(--surface3); }
+.split-toggle svg { width: 14px; height: 14px; color: var(--muted); }
+.output-panel {
+  height: 0; flex-shrink: 0;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transition: height 0.3s cubic-bezier(0.32, 0.94, 0.6, 1);
+  overflow: hidden;
+}
+.output-panel.open { height: 160px; }
+.output-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 14px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.output-tabs { display: flex; gap: 0; }
+.output-tab {
+  padding: 6px 14px; color: var(--muted);
+  font-size: 12px; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  letter-spacing: 0.03em;
+  transition: color 0.15s, border-color 0.15s; font-family: var(--font-body);
+}
+.output-tab.active { color: var(--accent); border-color: var(--accent); }
+.output-body {
+  flex: 1; padding: 10px 14px;
+  font-family: var(--font-mono); font-size: 12px; line-height: 1.6;
+  overflow-y: auto; color: var(--muted);
+}
+.output-body .ok { color: var(--success); }
+.output-body .err { color: var(--danger); }
+.output-body .warn { color: var(--warn); }
+.split-active .code-area { flex: 1; }
+.split-active .output-panel {
+  height: 100% !important;
+  width: 45%; border-top: none; border-left: 1px solid var(--border);
+}
+.split-active .editor-wrap { flex-direction: row; }
+.split-active .output-body { font-size: 11px; }
+.files-search { padding: 10px 16px; flex-shrink: 0; position: relative; }
+.files-search input {
+  width: 100%; padding: 10px 14px 10px 36px;
+  background: var(--surface2); border: none; border-radius: var(--radius-md);
+  color: var(--fg); font-size: 15px; outline: none; font-family: var(--font-body);
+  transition: background 0.15s;
+}
+.files-search input:focus { background: var(--surface3); }
+.files-search input::placeholder { color: var(--muted2); }
+.search-icon {
+  position: absolute; left: 26px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px; color: var(--muted2); pointer-events: none;
+}
+.files-list { flex: 1; overflow-y: auto; padding: 0 16px 8px; }
+.files-list::-webkit-scrollbar { width: 4px; }
+.files-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.file-section-label {
+  font-size: 12px; font-weight: 590; color: var(--muted);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 12px 4px 6px;
+}
+.file-row {
+  display: flex; align-items: center; padding: 10px 12px;
+  border-radius: var(--radius-md); cursor: pointer;
+  transition: background 0.15s; margin-bottom: 2px;
+  position: relative; overflow: hidden;
+}
+.file-row:active { background: var(--surface2); }
+.file-row.active { background: var(--accent-dim); }
+.file-row .f-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  margin-right: 10px; flex-shrink: 0;
+}
+.file-row .f-icon svg { width: 20px; height: 20px; }
+.file-row .f-icon.folder { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.file-row .f-icon.py { background: linear-gradient(135deg, var(--accent2), oklch(40% var(--accent-s) var(--accent-h))); }
+.file-row .f-icon.json { background: linear-gradient(135deg, #f97316, #ea580c); }
+.file-row .f-icon.md { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
+.file-row .f-icon.txt { background: var(--surface3); }
+.file-row .f-icon.yml { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+.file-row .f-icon.img { background: linear-gradient(135deg, #ec4899, #db2777); }
+.file-row .f-info { flex: 1; min-width: 0; }
+.file-row .f-name { font-size: 15px; font-weight: 500; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-row .f-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.file-row .f-more {
+  width: 30px; height: 30px; display: grid; place-items: center;
+  border-radius: 6px; color: var(--muted2); cursor: pointer; flex-shrink: 0;
+}
+.file-row .f-more:active { background: var(--surface2); }
+.file-row .f-more::after { content: '⋯'; font-size: 18px; letter-spacing: 0; }
+.file-row .swipe-bg {
+  position: absolute; top: 0; bottom: 0; right: 0;
+  display: flex; align-items: center;
+  padding: 0 16px; font-size: 13px; font-weight: 500;
+  color: #fff; border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.32, 0.94, 0.6, 1);
+}
+.file-row .swipe-bg.del { background: var(--danger); }
+.terminal-content { flex: 1; display: flex; flex-direction: column; background: var(--code-bg); }
+.term-session-bar {
+  display: flex; background: oklch(15% 0.01 250);
+  border-bottom: 1px solid oklch(22% 0.01 250); flex-shrink: 0;
+  overflow-x: auto; padding: 0 4px;
+}
+.term-session {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; font-size: 12px; color: var(--muted);
+  cursor: pointer; border-bottom: 2px solid transparent;
+  white-space: nowrap; transition: color 0.15s, border-color 0.15s;
+  font-family: var(--font-mono);
+}
+.term-session.active { color: var(--accent); border-color: var(--accent); }
+.term-session .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.term-session .dot.green { background: var(--success); }
+.term-session .dot.gray { background: var(--muted2); }
+.term-body {
+  flex: 1; padding: 14px 16px;
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.7;
+  overflow-y: auto; color: #e6edf3;
+}
+.term-body::-webkit-scrollbar { width: 4px; }
+.term-body::-webkit-scrollbar-thumb { background: oklch(25% 0.01 250); border-radius: 2px; }
+.term-prompt { color: var(--success); }
+.term-out { color: #8b949e; }
+.term-err { color: var(--danger); }
+.term-input-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px;
+  background: oklch(15% 0.01 250);
+  border-top: 1px solid oklch(22% 0.01 250);
+}
+.term-input-row .prompt { color: var(--success); font-family: var(--font-mono); font-size: 13px; }
+.term-input {
+  flex: 1; background: transparent; border: none;
+  color: #e6edf3; font-family: var(--font-mono); font-size: 14px; outline: none;
+}
+.term-keys {
+  display: flex; gap: 5px; padding: 6px 16px 10px;
+  overflow-x: auto; flex-shrink: 0; background: oklch(14% 0.01 250);
+}
+.term-keys::-webkit-scrollbar { height: 0; }
+.term-key {
+  padding: 6px 12px; background: oklch(20% 0.015 250);
+  border: 1px solid oklch(25% 0.01 250); border-radius: 6px;
+  color: var(--muted); font-size: 12px; white-space: nowrap;
+  cursor: pointer; font-family: var(--font-body);
+  transition: background 0.15s;
+}
+.term-key:active { background: oklch(28% 0.015 250); }
+.ai-content { flex: 1; display: flex; flex-direction: column; }
+.ai-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ai-avatar {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent), oklch(58% 0.18 280));
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.ai-avatar svg { width: 18px; height: 18px; color: #000; }
+.ai-h-info { flex: 1; }
+.ai-h-info h3 { font-size: 15px; font-weight: 590; letter-spacing: -0.01em; }
+.ai-h-info p { font-size: 11px; color: var(--muted); }
+.ai-free-badge {
+  padding: 3px 10px; border-radius: 14px;
+  font-size: 11px; font-weight: 590;
+  font-family: var(--font-body); border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.ai-free-badge.low { background: oklch(40% 0.18 25 / 0.25); color: var(--danger); border-color: var(--danger); }
+.ai-free-badge.ok { background: var(--accent-dim); color: var(--accent); }
+.ai-free-badge.done { background: oklch(40% 0.18 25 / 0.25); color: var(--danger); border-color: var(--danger); cursor: pointer; }
+.ai-model-badge {
+  padding: 4px 10px; background: var(--surface2); border-radius: 14px;
+  font-size: 11px; color: var(--muted); border: 1px solid var(--border);
+  cursor: pointer; font-family: var(--font-body);
+}
+.ai-messages {
+  flex: 1; padding: 16px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.ai-messages::-webkit-scrollbar { width: 4px; }
+.ai-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.ai-msg {
+  max-width: 88%; padding: 12px 16px;
+  border-radius: 18px; font-size: 14px; line-height: 1.5;
+}
+.ai-msg.user {
+  align-self: flex-end; background: var(--accent); color: #000;
+  border-bottom-right-radius: 4px;
+}
+.ai-msg.assistant {
+  align-self: flex-start; background: var(--surface); color: var(--fg);
+  border-bottom-left-radius: 4px;
+}
+.ai-msg .code-b {
+  background: var(--code-bg); padding: 10px 12px; border-radius: 8px;
+  margin-top: 8px; font-family: var(--font-mono); font-size: 12px;
+  line-height: 1.6; overflow-x: auto; white-space: pre; color: #e6edf3;
+  position: relative;
+}
+.ai-msg .code-copy {
+  position: absolute; top: 6px; right: 6px;
+  padding: 3px 8px; background: oklch(30% 0.01 250); border: none;
+  border-radius: 4px; color: var(--muted); font-size: 10px; cursor: pointer;
+  font-family: var(--font-body); transition: background 0.15s;
+}
+.ai-msg .code-copy:active { background: oklch(40% 0.01 250); }
+.ai-input-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px 12px; background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.ai-input {
+  flex: 1; padding: 12px 16px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 22px;
+  color: var(--fg); font-size: 15px; outline: none;
+  font-family: var(--font-body); transition: border-color 0.15s;
+}
+.ai-input:focus { border-color: var(--accent); }
+.ai-input:disabled { opacity: 0.4; }
+.ai-send {
+  width: 44px; height: 44px; background: var(--accent);
+  border-radius: 50%; border: none; display: grid; place-items: center;
+  cursor: pointer; flex-shrink: 0; transition: background 0.15s;
+}
+.ai-send:active { background: var(--accent2); }
+.ai-send:disabled { opacity: 0.3; }
+.ai-send svg { width: 20px; height: 20px; color: #000; }
+.ai-actions {
+  display: flex; gap: 5px; padding: 8px 16px 0;
+  flex-wrap: wrap; flex-shrink: 0;
+}
+.ai-action {
+  padding: 5px 12px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 14px;
+  color: var(--muted); font-size: 12px; cursor: pointer;
+  font-family: var(--font-body); transition: background 0.15s;
+}
+.ai-action:active { background: var(--surface3); }
+.ai-action:disabled { opacity: 0.3; cursor: default; }
+.ssh-content { flex: 1; overflow-y: auto; padding: 16px; }
+.ssh-content::-webkit-scrollbar { width: 4px; }
+.ssh-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.ssh-card {
+  background: var(--surface); border-radius: var(--radius-lg);
+  padding: 16px; margin-bottom: 12px;
+  border: 1px solid var(--border); transition: border-color 0.2s;
+}
+.ssh-card:hover { border-color: var(--border2); }
+.ssh-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.ssh-card .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ssh-card .status-dot.online { background: var(--success); }
+.ssh-card .status-dot.offline { background: var(--muted2); }
+.ssh-card-host { font-size: 15px; font-weight: 590; flex: 1; }
+.ssh-card-host .host-sub { font-size: 12px; font-weight: 400; color: var(--muted); margin-left: 8px; }
+.ssh-card-ip { font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin-bottom: 6px; }
+.ssh-card-actions { display: flex; gap: 8px; margin-top: 8px; }
+.ssh-btn {
+  padding: 8px 16px; border-radius: 8px; border: none;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  font-family: var(--font-body); transition: background 0.15s;
+}
+.ssh-btn:active { opacity: 0.8; }
+.ssh-btn.connect { background: var(--accent); color: #000; }
+.ssh-btn.disconnect { background: var(--danger); color: #fff; }
+.ssh-btn.edit { background: var(--surface2); color: var(--fg); border: 1px solid var(--border); }
+.ssh-add {
+  padding: 14px 16px; border: 2px dashed var(--border);
+  border-radius: var(--radius-lg); display: flex; align-items: center;
+  justify-content: center; gap: 8px; color: var(--muted); font-size: 14px;
+  cursor: pointer; transition: border-color 0.15s, color 0.15s;
+}
+.ssh-add:active { border-color: var(--accent); color: var(--accent); }
+.tools-content { flex: 1; overflow-y: auto; padding: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-content: start; }
+.tools-content::-webkit-scrollbar { width: 4px; }
+.tools-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.tool-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  cursor: pointer; transition: background 0.15s, border-color 0.15s;
+  aspect-ratio: 1;
+}
+.tool-card:hover { border-color: var(--border2); }
+.tool-card:active { background: var(--surface2); }
+.tool-card svg { width: 28px; height: 28px; color: var(--accent); }
+.tool-card .t-label { font-size: 12px; font-weight: 500; color: var(--muted); text-align: center; }
+.tool-card .t-count { font-size: 10px; color: var(--muted2); }
+
+/* ===== Subscription Paywall Overlay ===== */
+.paywall-overlay {
+  position: absolute; inset: 0; z-index: 600;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: none; flex-direction: column;
+  justify-content: flex-end; padding: 20px;
+}
+.paywall-overlay.open { display: flex; }
+.paywall-card {
+  background: oklch(20% 0.015 250);
+  border-radius: 28px; padding: 24px;
+  border: 1px solid var(--border);
+  animation: sheetUp 0.4s cubic-bezier(0.32, 0.94, 0.6, 1);
+}
+.paywall-icon {
+  width: 56px; height: 56px; border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: grid; place-items: center; margin: 0 auto 16px;
+}
+.paywall-icon svg { width: 28px; height: 28px; color: #000; }
+.paywall-title { font-size: 22px; font-weight: 700; text-align: center; letter-spacing: -0.02em; margin-bottom: 4px; }
+.paywall-subtitle { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 20px; }
+.paywall-plans { display: flex; gap: 10px; margin-bottom: 16px; }
+.paywall-plan {
+  flex: 1; background: var(--surface2); border-radius: 16px;
+  padding: 16px; text-align: center; cursor: pointer;
+  border: 2px solid transparent; transition: border-color 0.2s, background 0.2s;
+}
+.paywall-plan.active { border-color: var(--accent); background: var(--surface); }
+.paywall-plan:active { background: var(--surface3); }
+.paywall-plan .pp-name { font-size: 13px; color: var(--muted); margin-bottom: 4px; font-weight: 500; }
+.paywall-plan .pp-price { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+.paywall-plan .pp-price span { font-size: 14px; font-weight: 400; color: var(--muted); }
+.paywall-plan .pp-desc { font-size: 11px; color: var(--muted2); margin-top: 6px; }
+.paywall-plan .pp-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  background: var(--accent-dim); color: var(--accent);
+  font-size: 10px; font-weight: 600; margin-top: 6px;
+}
+.paywall-btn {
+  width: 100%; padding: 16px; border: none; border-radius: 14px;
+  background: var(--accent); color: #000; font-size: 17px;
+  font-weight: 600; cursor: pointer; font-family: var(--font-body);
+  transition: background 0.15s; margin-bottom: 10px;
+}
+.paywall-btn:active { background: var(--accent2); }
+.paywall-btn:disabled { opacity: 0.5; }
+.paywall-footer { display: flex; justify-content: center; gap: 16px; }
+.paywall-footer button {
+  background: none; border: none; color: var(--muted);
+  font-size: 13px; cursor: pointer; font-family: var(--font-body);
+  padding: 4px 8px;
+}
+.paywall-footer button:active { color: var(--fg); }
+.paywall-terms { font-size: 10px; color: var(--muted2); text-align: center; margin-top: 10px; line-height: 1.5; }
+
+/* Settings */
+.settings-content { flex: 1; overflow-y: auto; }
+.settings-content::-webkit-scrollbar { width: 4px; }
+.settings-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.settings-h1 {
+  padding: 16px 20px 4px; font-size: 28px; font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.settings-sec { padding: 8px 16px; }
+.settings-sec-title {
+  font-size: 12px; font-weight: 590; color: var(--muted);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  margin-bottom: 6px; padding-left: 4px;
+}
+.settings-group {
+  background: var(--surface); border-radius: var(--radius-lg);
+  overflow: hidden; border: 1px solid var(--border);
+}
+.settings-item {
+  display: flex; align-items: center;
+  padding: 13px 16px; cursor: pointer;
+  transition: background 0.15s; min-height: 48px;
+}
+.settings-item:not(:last-child) { border-bottom: 1px solid var(--border); }
+.settings-item:active { background: var(--surface2); }
+.settings-sicon {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: grid; place-items: center; margin-right: 12px; flex-shrink: 0;
+}
+.settings-sicon svg { width: 16px; height: 16px; }
+.settings-label { flex: 1; font-size: 15px; }
+.settings-val { font-size: 14px; color: var(--muted); margin-right: 6px; }
+.settings-arrow { color: var(--muted2); font-size: 16px; }
+.settings-toggle {
+  width: 46px; height: 28px; background: oklch(35% 0.01 250);
+  border-radius: 14px; position: relative; cursor: pointer;
+  transition: background 0.25s; flex-shrink: 0;
+}
+.settings-toggle.on { background: var(--success); }
+.settings-toggle::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 22px; height: 22px; background: #fff;
+  border-radius: 50%; transition: transform 0.25s cubic-bezier(0.32, 0.94, 0.6, 1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.settings-toggle.on::after { transform: translateX(18px); }
+.settings-footer { padding: 20px; text-align: center; }
+.settings-footer p { font-size: 11px; color: var(--muted2); margin-bottom: 4px; }
+
+/* iOS Segmented Control: 浅色 / 深色 模式切换 */
+.mode-seg {
+  display: flex; margin: 0 16px 12px;
+  background: var(--surface2);
+  border-radius: 9px; padding: 2px;
+  border: 1px solid var(--border);
+}
+.mode-seg-btn {
+  flex: 1; padding: 6px 12px;
+  background: transparent; border: none;
+  color: var(--muted); font: 13px/1 var(--font-body); font-weight: 510;
+  border-radius: 7px; cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  letter-spacing: 0.01em;
+}
+.mode-seg-btn.active {
+  background: var(--surface);
+  color: var(--fg);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 0 0 0.5px var(--border);
+  font-weight: 600;
+}
+.mode-seg-btn:not(.active):active { background: var(--surface3); }
+
+/* Theme picker in settings */
+.theme-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 16px; cursor: pointer;
+  transition: background 0.12s; min-height: 52px;
+}
+.theme-row:active { background: var(--surface2); }
+.theme-swatch {
+  width: 40px; height: 40px; border-radius: 12px;
+  flex-shrink: 0; border: 2px solid transparent;
+  transition: border-color 0.2s; display: grid; place-items: center;
+  position: relative;
+}
+.theme-swatch.active { border-color: var(--fg); }
+.theme-swatch.active::after {
+  content: '✓'; font-size: 16px; font-weight: 700;
+  color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+.theme-info { flex: 1; }
+.theme-info .t-name { font-size: 15px; font-weight: 500; }
+.theme-info .t-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.theme-sep { height: 1px; background: var(--border); margin: 4px 16px; }
+
+/* Modal — iOS Sheet Animation */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 500; display: none; justify-content: center;
+  align-items: flex-end;
+}
+.modal-overlay.open { display: flex; }
+.modal-sheet {
+  position: relative;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 8px 0 34px;
+  width: 100%; max-width: 430px;
+  z-index: 501;
+  transform: translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  border: 1px solid var(--border);
+  border-bottom: none;
+}
+.modal-overlay.open .modal-sheet { transform: translateY(0); }
+.modal-sheet::before {
+  content: '';
+  width: 36px; height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  margin: 0 auto 12px;
+  display: block;
+}
+.modal-handle { display: none; }
+.modal-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px; cursor: pointer;
+  transition: background 0.12s;
+}
+.modal-item:active { background: var(--surface2); }
+.modal-item svg { width: 22px; height: 22px; color: var(--accent); }
+.modal-item .m-label { font-size: 16px; }
+.modal-item .m-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.modal-title { font-size: 17px; font-weight: 600; }
+.ctx-sheet { max-height: 70vh; }
+.ctx-target-name { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filetype-btn {
+  flex: 1; padding: 8px 4px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--muted); cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.filetype-btn.active { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+.filetype-btn:active { background: var(--surface3); }
+.scene-tool {
+  padding: 5px 12px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--muted); font-size: 12px; cursor: pointer;
+  transition: all 0.15s;
+}
+.scene-tool.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.scene-tool:active { background: var(--surface3); }
+.nb-cell textarea { line-height: 1.5; }
+.mini-template { transition: border-color 0.15s, border-width 0.15s; }
+.toast {
+  position: fixed; bottom: 88px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  padding: 10px 20px; background: var(--surface3);
+  border: 1px solid var(--border); border-radius: 12px;
+  color: var(--fg); font-size: 13px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.12);
+  z-index: 9999; opacity: 0;
+  transition: opacity 0.22s cubic-bezier(0.33, 1, 0.68, 1),
+              transform 0.28s cubic-bezier(0.33, 1, 0.68, 1);
+  pointer-events: none; white-space: nowrap;
+  font-family: var(--font-body);
+  max-width: calc(100vw - 48px);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Active press feedback */
+.btn-press:active,
+.tool-card:active,
+.term-key:active,
+.mode-seg-btn:active,
+.theme-row:active,
+.settings-item:active,
+.paywall-plan:active,
+.nav-btn:active,
+.editor-tab:active {
+  opacity: 0.65;
+  transform: scale(0.97);
+  transition: transform 0.1s, opacity 0.1s;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.25s ease both; }
+.more-indicator {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--accent); position: absolute; bottom: 1px; left: 50%;
+  margin-left: -2px; display: none;
+}
+.more-indicator.show { display: block; }
+
+/* Subscription screen */
+.sub-content { flex: 1; overflow-y: auto; }
+.sub-content::-webkit-scrollbar { width: 4px; }
+.sub-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.sub-hero {
+  padding: 28px 24px 20px; text-align: center;
+  background: linear-gradient(180deg, var(--accent-dim) 0%, transparent 100%);
+}
+.sub-hero h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+.sub-hero p { font-size: 14px; color: var(--muted); }
+.sub-hero .sub-price { font-size: 44px; font-weight: 700; letter-spacing: -0.03em; margin: 8px 0 2px; }
+.sub-hero .sub-price span { font-size: 18px; font-weight: 500; color: var(--muted); }
+.sub-features { padding: 16px; }
+.sub-feature-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.sub-feature-item:last-child { border: none; }
+.sub-feature-item svg { width: 22px; height: 22px; color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+.sub-fi-info { flex: 1; }
+.sub-fi-info h4 { font-size: 15px; font-weight: 590; }
+.sub-fi-info p { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.sub-cta-wrap { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.sub-cta {
+  padding: 16px; border: none; border-radius: 14px;
+  font-size: 17px; font-weight: 600; cursor: pointer;
+  font-family: var(--font-body); transition: background 0.15s;
+}
+.sub-cta.primary { background: var(--accent); color: #000; }
+.sub-cta.primary:active { background: var(--accent2); }
+.sub-cta.secondary { background: var(--surface2); color: var(--fg); border: 1px solid var(--border); }
+.sub-cta.secondary:active { background: var(--surface3); }
+.sub-terms { font-size: 10px; color: var(--muted2); text-align: center; padding: 0 16px 16px; line-height: 1.5; }
+.sub-plan-selector { display: flex; background: var(--surface2); border-radius: 12px; padding: 3px; margin: 0 24px; }
+.sub-plan-btn { flex: 1; text-align: center; padding: 8px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+.sub-plan-btn.active { background: var(--accent); color: #000; }
+</style>
+</head>
+<body>
+
+<div class="phone-frame" id="app" data-theme="emerald" data-mode="light">
+  <div class="dynamic-island"></div>
+
+  <div class="status-bar">
+    <span id="status-time">09:41</span>
+    <div class="s-icons">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.858 15.355-5.858 21.213 0"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+  <div class="home-indicator"></div>
+
+  <!-- ===== Screen: Files ===== -->
+  <div class="screen" id="s-files">
+    <div class="nav-bar">
+      <div class="nav-left"><span class="nav-title">文件</span></div>
+      <div class="nav-right">
+        <button class="nav-btn" onclick="openNewFolder()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+        </button>
+        <button class="nav-btn" onclick="openNewFile()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="files-search">
+      <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input type="text" placeholder="搜索文件..." oninput="filterFiles(this.value)" id="file-search-input">
+    </div>
+    <div class="files-list" id="files-list">
+      <div class="file-section-label">项目文件</div>
+      <div class="file-row" data-name="my_project">
+        <div class="f-icon folder"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg></div>
+        <div class="f-info"><div class="f-name">my_project</div><div class="f-meta">文件夹 · 12 个文件</div></div>
+        <div class="f-more"></div>
+        <div class="swipe-bg del">删除</div>
+      </div>
+      <div class="file-row" data-name="main.py" onclick="openFile('main.py')">
+        <div class="f-icon py"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
+        <div class="f-info"><div class="f-name">main.py</div><div class="f-meta">Python · 2.4 KB · 刚刚</div></div>
+        <div class="f-more"></div>
+        <div class="swipe-bg del">删除</div>
+      </div>
+      <div class="file-row" data-name="utils.py" onclick="openFile('utils.py')">
+        <div class="f-icon py"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
+        <div class="f-info"><div class="f-name">utils.py</div><div class="f-meta">Python · 1.1 KB · 今天 15:32</div></div>
+        <div class="f-more"></div>
+        <div class="swipe-bg del">删除</div>
+      </div>
+      <div class="file-row" data-name="notebook.ipynb">
+        <div class="f-icon json"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
+        <div class="f-info"><div class="f-name">notebook.ipynb</div><div class="f-meta">Notebook · 8.6 KB · 今天</div></div>
+        <div class="f-more"></div>
+        <div class="swipe-bg del">删除</div>
+      </div>
+      <div class="file-row" data-name="config.json" onclick="openFile('config.json')">
+        <div class="f-icon json"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg></div>
+        <div class="f-info"><div class="f-name">config.json</div><div class="f-meta">JSON · 256 B · 昨天</div></div>
+        <div class="f-more"></div>
+        <div class="swipe-bg del">删除</div>
+      </div>
+      <div class="file-section-label">数据</div>
+      <div class="file-row" data-name="data">
+        <div class="f-icon folder"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg></div>
+        <div class="f-info"><div class="f-name">data</div><div class="f-meta">文件夹 · 5 个文件</div></div>
+        <div class="f-more"></div>
+        <div class="swipe-bg del">删除</div>
+      </div>
+      <div class="file-row" data-name="users.json">
+        <div class="f-icon json"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg></div>
+        <div class="f-info"><div class="f-name">users.json</div><div class="f-meta">JSON · 3.2 KB · 3 天前</div></div>
+        <div class="f-more"></div>
+        <div class="swipe-bg del">删除</div>
+      </div>
+      <div class="file-row" data-name="README.md">
+        <div class="f-icon md"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+        <div class="f-info"><div class="f-name">README.md</div><div class="f-meta">Markdown · 1.8 KB</div></div>
+        <div class="f-more"></div>
+        <div class="swipe-bg del">删除</div>
+      </div>
+      <div class="file-row" data-name="requirements.txt">
+        <div class="f-icon txt"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+        <div class="f-info"><div class="f-name">requirements.txt</div><div class="f-meta">Text · 128 B</div></div>
+        <div class="f-more"></div>
+        <div class="swipe-bg del">删除</div>
+      </div>
+      <div class="file-row" data-name="screenshot.png">
+        <div class="f-icon img"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+        <div class="f-info"><div class="f-name">screenshot.png</div><div class="f-meta">PNG · 2.1 MB</div></div>
+        <div class="f-more"></div>
+        <div class="swipe-bg del">删除</div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ===== Screen: Editor ===== -->
+  <div class="screen active" id="s-editor">
+    <div class="nav-bar">
+      <div class="nav-left">
+        <button class="nav-btn" onclick="switchTab('files')">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <span class="nav-title">main.py</span>
+      </div>
+      <div class="nav-right">
+        <button class="nav-btn" onclick="showToast('代码格式化完成')">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        </button>
+        <button class="nav-btn run-btn" onclick="runCode()">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="file-tabs">
+      <div class="file-tab active" data-file="main.py" onclick="switchToTab('main.py')">
+        <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16"/></svg>
+        main.py <span class="f-close" onclick="event.stopPropagation();closeTab('main.py')">&times;</span>
+      </div>
+      <div class="file-tab" data-file="utils.py" onclick="switchToTab('utils.py')">
+        <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16"/></svg>
+        utils.py <span class="f-close" onclick="event.stopPropagation();closeTab('utils.py')">&times;</span>
+      </div>
+      <div class="file-tab" data-file="config.json" onclick="switchToTab('config.json')">
+        <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m-8-8h16"/></svg>
+        config.json <span class="f-close" onclick="event.stopPropagation();closeTab('config.json')">&times;</span>
+      </div>
+      <div class="file-tab" data-file="notebook.ipynb" onclick="switchToTab('notebook.ipynb')">
+        <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16"/></svg>
+        notebook.ipynb <span class="f-close" onclick="event.stopPropagation();closeTab('notebook.ipynb')">&times;</span>
+      </div>
+    </div>
+    <div class="editor-wrap" id="editor-wrap">
+      <div class="code-area">
+        <div class="line-nums" id="line-nums"></div>
+        <div class="code-wrap" id="code-wrap"></div>
+        <div class="split-toggle" onclick="toggleSplit()" title="分栏模式">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/></svg>
+        </div>
+      </div>
+      <div class="output-panel" id="output-panel">
+        <div class="output-header">
+          <div class="output-tabs">
+            <span class="output-tab active" onclick="switchOutTab(this)">输出</span>
+            <span class="output-tab" onclick="switchOutTab(this)">问题</span>
+            <span class="output-tab" onclick="switchOutTab(this)">调试</span>
+          </div>
+          <button class="nav-btn" style="width:30px;height:30px;" onclick="toggleOutput()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="output-body" id="output-body">
+          <span class="ok">❯</span> /Users/dev python main.py<br>
+          Computing Fibonacci...<br>
+          fib(0) = 0 … fib(9) = 34<br>
+          <span class="ok">✓ 运行完成，耗时 0.09s</span>
+        </div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ===== Screen: Terminal ===== -->
+  <div class="screen" id="s-terminal">
+    <div class="nav-bar">
+      <div class="nav-left"><span class="nav-title" style="font-family:var(--font-mono);font-size:15px;">~ $</span></div>
+      <div class="nav-right">
+        <button class="nav-btn" onclick="newTermSession()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        </button>
+        <button class="nav-btn" onclick="switchTab('editor')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="term-session-bar">
+      <div class="term-session active" onclick="switchTermSession(this)"><span class="dot green"></span> local</div>
+      <div class="term-session" onclick="switchTermSession(this)"><span class="dot gray"></span> SSH: server01</div>
+      <div class="term-session" onclick="switchTermSession(this)"><span class="dot gray"></span> SSH: dev-box</div>
+    </div>
+    <div class="terminal-content">
+      <div class="term-body" id="term-body">
+        <div><span style="color:var(--accent);">PythonIDE Terminal</span> <span style="color:var(--muted);">· Python 3.13.1</span></div>
+        <div style="margin-top:4px;"><span style="color:var(--muted);">Type </span><span class="term-key" onclick="termInsert('python main.py')" style="cursor:pointer;">python main.py</span><span style="color:var(--muted);"> or </span><span class="term-key" onclick="termInsert('ls -la')" style="cursor:pointer;">ls</span><span style="color:var(--muted);"> to start</span></div>
+        <div style="margin-top:8px;"><span style="color:var(--accent);">user@pythonide</span>:<span style="color:var(--fn);">~/project</span>$ <span class="term-out">help</span></div>
+        <div class="term-out" style="white-space:pre-wrap;">Available commands:
+  python, pip, npm, git
+  ls, cd, pwd, cat, mkdir, rm, cp, mv
+  echo, grep, awk, sed
+  curl, wget, ping
+  ps, top, df, free, kill
+  clear, history, uname, whoami, date, uptime</div>
+        <div><span style="color:var(--accent);">user@pythonide</span>:<span style="color:var(--fn);">~/project</span>$ <span class="term-out">python main.py</span></div>
+        <div class="term-out">fib(10) = 55
+fact(10) = 3628800</div>
+        <div><span style="color:var(--accent);">user@pythonide</span>:<span style="color:var(--fn);">~/project</span>$ </div>
+      </div>
+      <div class="term-input-row">
+        <span class="prompt">$</span>
+        <input type="text" class="term-input" id="term-input" placeholder="输入命令..." onkeydown="termKeydown(event)">
+      </div>
+      <div class="term-keys">
+        <span class="term-key" onclick="termInsert('python ')">python</span>
+        <span class="term-key" onclick="termInsert('pip install ')">pip install</span>
+        <span class="term-key" onclick="termInsert('ls -la')">ls</span>
+        <span class="term-key" onclick="termInsert('git status')">git</span>
+        <span class="term-key" onclick="termInsert('npm start')">npm</span>
+        <span class="term-key" onclick="termInsert('clear')">clear</span>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ===== Screen: AI + Subscription ===== -->
+  <div class="screen" id="s-ai">
+    <div class="ai-header">
+      <div class="ai-avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
+      <div class="ai-h-info"><h3>AI 助手</h3><p>● 在线 · DeepSeek · 代码模型</p></div>
+      <span class="ai-free-badge ok" id="ai-free-badge">剩余 10 次</span>
+      <span class="ai-model-badge">v3</span>
+    </div>
+    <div class="ai-content">
+      <div class="ai-messages" id="ai-msgs">
+        <div class="ai-msg user">如何用 Python 实现一个 LRU 缓存？</div>
+        <div class="ai-msg assistant">
+          可以使用 <code>functools.lru_cache</code> 装饰器，或者手动实现双向链表 + 哈希表：
+          <div class="code-b"><button class="code-copy" onclick="copyCode(this)">复制</button>from collections import OrderedDict
+class LRUCache:
+    def __init__(self, capacity):
+        self.cache = OrderedDict()
+        self.cap = capacity
+    def get(self, key):
+        if key not in self.cache: return -1
+        self.cache.move_to_end(key)
+        return self.cache[key]
+    def put(self, key, value):
+        if key in self.cache: self.cache.move_to_end(key)
+        self.cache[key] = value
+        if len(self.cache) > self.cap:
+            self.cache.popitem(last=False)</div>
+          OrderedDict 内部维护了双向链表，move_to_end 是 O(1) 操作。
+        </div>
+        <div class="ai-msg user">帮我写一个快速排序</div>
+        <div class="ai-msg assistant">
+          以下是一个原地分区的快速排序：
+          <div class="code-b"><button class="code-copy" onclick="copyCode(this)">复制</button>def quicksort(arr, lo=0, hi=None):
+    if hi is None: hi = len(arr)-1
+    if lo < hi:
+        p = partition(arr, lo, hi)
+        quicksort(arr, lo, p-1)
+        quicksort(arr, p+1, hi)
+def partition(arr, lo, hi):
+    pivot = arr[hi]; i = lo-1
+    for j in range(lo, hi):
+        if arr[j] <= pivot:
+            i += 1; arr[i],arr[j]=arr[j],arr[i]
+    arr[i+1],arr[hi]=arr[hi],arr[i+1]
+    return i+1</div>
+          平均 O(n log n)，最坏 O(n²)。随机选择 pivot 可缓解最坏情况。
+        </div>
+      </div>
+      <div class="ai-actions">
+        <span class="ai-action" onclick="aiQuickAction(this)">解释代码</span>
+        <span class="ai-action" onclick="aiQuickAction(this)">优化性能</span>
+        <span class="ai-action" onclick="aiQuickAction(this)">查找 Bug</span>
+        <span class="ai-action" onclick="aiQuickAction(this)">添加注释</span>
+        <span class="ai-action" onclick="aiQuickAction(this)">写测试</span>
+        <span class="ai-action" onclick="aiQuickAction(this)">重构</span>
+      </div>
+      <div class="ai-input-row">
+        <input type="text" class="ai-input" id="ai-input" placeholder="输入问题..." onkeydown="aiKeydown(event)">
+        <button class="ai-send" onclick="aiSend()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Paywall Overlay (shown when free uses exhausted) -->
+    <div class="paywall-overlay" id="paywall">
+      <div class="paywall-card">
+        <div class="paywall-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
+        <div class="paywall-title">解锁 AI 助手</div>
+        <div class="paywall-subtitle">免费次数已用完，订阅后无限使用 AI 编程助手</div>
+        <div class="paywall-plans">
+          <div class="paywall-plan active" id="plan-monthly" onclick="selectPlan('monthly')">
+            <div class="pp-name">月付</div>
+            <div class="pp-price">¥25<span>/月</span></div>
+            <div class="pp-desc">无限 AI 查询，随时取消</div>
+          </div>
+          <div class="paywall-plan" id="plan-yearly" onclick="selectPlan('yearly')">
+            <div class="pp-name">年付</div>
+            <div class="pp-price">¥198<span>/年</span></div>
+            <div class="pp-desc">省 34%，约 ¥16.5/月</div>
+            <div class="pp-badge">最划算</div>
+          </div>
+        </div>
+        <button class="paywall-btn" onclick="subscribe()">订阅后继续使用</button>
+        <div class="paywall-footer">
+          <button onclick="hidePaywall()">稍后再说</button>
+          <button onclick="showToast('恢复购买')">恢复购买</button>
+        </div>
+        <div class="paywall-terms">订阅自动续期，可随时在设置中取消。付款通过 App Store 处理。</div>
+      </div>
+    </div>
+
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ===== Screen: Settings ===== -->
+  <div class="screen" id="s-settings">
+    <div class="nav-bar">
+      <div class="nav-left">
+        <button class="nav-btn" onclick="switchTab('more')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">设置</div>
+      <div class="nav-right"></div>
+    </div>
+    <div class="settings-content">
+      <div class="settings-h1">设置</div>
+
+      <!-- Subscription -->
+      <div class="settings-sec">
+        <div class="settings-sec-title">订阅</div>
+        <div class="settings-group">
+          <div class="settings-item" onclick="showSubScreen()">
+            <div class="settings-sicon" style="background:var(--accent-dim);color:var(--accent);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
+            <span class="settings-label">AI 订阅</span>
+            <span class="settings-val" id="settings-sub-status">未订阅</span>
+            <span class="settings-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appearance (light/dark + theme swatch) -->
+      <div class="settings-sec">
+        <div class="settings-sec-title">外观</div>
+
+        <!-- iOS Segmented Control: 跟随系统 / 浅色 / 深色 -->
+        <div class="mode-seg" id="mode-seg" role="tablist">
+          <button type="button" class="mode-seg-btn" data-mode-value="light" onclick="setMode('light')">浅色</button>
+          <button type="button" class="mode-seg-btn" data-mode-value="dark" onclick="setMode('dark')">深色</button>
+        </div>
+
+        <!-- 7 个色板 swatch 列表（深浅色共享同一组） -->
+        <div class="settings-group" id="theme-list">
+          <div class="theme-row" data-theme-value="emerald" onclick="setTheme('emerald')">
+            <div class="theme-swatch active" style="background:oklch(0.62 0.18 150);"></div>
+            <div class="theme-info"><div class="t-name">翠绿</div><div class="t-desc">Python 经典绿 · 默认</div></div>
+          </div>
+          <div class="theme-sep"></div>
+          <div class="theme-row" data-theme-value="ocean" onclick="setTheme('ocean')">
+            <div class="theme-swatch" style="background:oklch(0.55 0.20 250);"></div>
+            <div class="theme-info"><div class="t-name">海洋蓝</div><div class="t-desc">iOS 系统蓝 · 清爽专业</div></div>
+          </div>
+          <div class="theme-sep"></div>
+          <div class="theme-row" data-theme-value="lilac" onclick="setTheme('lilac')">
+            <div class="theme-swatch" style="background:oklch(0.55 0.18 290);"></div>
+            <div class="theme-info"><div class="t-name">丁香紫</div><div class="t-desc">优雅紫 · 创意灵感</div></div>
+          </div>
+          <div class="theme-sep"></div>
+          <div class="theme-row" data-theme-value="sunset" onclick="setTheme('sunset')">
+            <div class="theme-swatch" style="background:oklch(0.62 0.18 70);"></div>
+            <div class="theme-info"><div class="t-name">日落橙</div><div class="t-desc">温暖橙 · 活力满满</div></div>
+          </div>
+          <div class="theme-sep"></div>
+          <div class="theme-row" data-theme-value="rose" onclick="setTheme('rose')">
+            <div class="theme-swatch" style="background:oklch(0.62 0.18 350);"></div>
+            <div class="theme-info"><div class="t-name">玫瑰粉</div><div class="t-desc">精致粉 · 独特风格</div></div>
+          </div>
+          <div class="theme-sep"></div>
+          <div class="theme-row" data-theme-value="teal" onclick="setTheme('teal')">
+            <div class="theme-swatch" style="background:oklch(0.62 0.16 190);"></div>
+            <div class="theme-info"><div class="t-name">碧波青</div><div class="t-desc">清新青 · 沉浸开发</div></div>
+          </div>
+          <div class="theme-sep"></div>
+          <div class="theme-row" data-theme-value="graphite" onclick="setTheme('graphite')">
+            <div class="theme-swatch" style="background:oklch(0.62 0 250);"></div>
+            <div class="theme-info"><div class="t-name">石墨灰</div><div class="t-desc">极简灰 · 专注代码</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- General settings -->
+      <div class="settings-sec">
+        <div class="settings-sec-title">通用</div>
+        <div class="settings-group">
+          <div class="settings-item" onclick="showToast('Python 版本 3.13.1')">
+            <div class="settings-sicon" style="background:var(--accent-dim);color:var(--accent);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16"/></svg></div>
+            <span class="settings-label">Python 版本</span><span class="settings-val">3.13.1</span><span class="settings-arrow">›</span>
+          </div>
+          <div class="settings-item" onclick="showToast('42 个包已安装')">
+            <div class="settings-sicon" style="background:oklch(40% 0.18 145 / 0.3);color:var(--success);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
+            <span class="settings-label">已安装包</span><span class="settings-val">42 个</span><span class="settings-arrow">›</span>
+          </div>
+          <div class="settings-item" onclick="showToast('156 MB 已用')">
+            <div class="settings-sicon" style="background:oklch(40% 0.16 85 / 0.3);color:var(--warn);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
+            <span class="settings-label">储存空间</span><span class="settings-val">156 MB</span><span class="settings-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-footer"><p>PythonIDE · v2.0 · 暗黑主题</p><p style="font-size:10px;color:var(--muted2);display:flex;justify-content:center;gap:16px;margin-top:6px;"><span>隐私政策</span><span>用户协议</span><span>帮助</span></p></div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ===== Screen: Subscription Details ===== -->
+  <div class="screen" id="s-subscription">
+    <div class="nav-bar">
+      <div class="nav-left">
+        <button class="nav-btn" onclick="switchTab('settings')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+      </div>
+      <div class="nav-title">AI 订阅</div>
+      <div class="nav-right"></div>
+    </div>
+    <div class="sub-content">
+      <div class="sub-hero">
+        <h1>AI 编程助手</h1>
+        <p>无限次 AI 代码查询 · 智能调试 · 代码解释</p>
+        <div class="sub-plan-selector">
+          <div class="sub-plan-btn active" id="splan-monthly" onclick="selectSubPlan('monthly')">月付</div>
+          <div class="sub-plan-btn" id="splan-yearly" onclick="selectSubPlan('yearly')">年付</div>
+        </div>
+        <div class="sub-price" id="sub-price">¥25<span>/月</span></div>
+      </div>
+      <div class="sub-features">
+        <div class="sub-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <div class="sub-fi-info"><h4>无限 AI 查询</h4><p>不再受次数限制，随时随地提问编程问题</p></div>
+        </div>
+        <div class="sub-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <div class="sub-fi-info"><h4>代码解释 & 调试</h4><p>逐行解释复杂代码，快速定位 Bug</p></div>
+        </div>
+        <div class="sub-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <div class="sub-fi-info"><h4>性能优化建议</h4><p>AI 分析代码性能瓶颈，给出优化方案</p></div>
+        </div>
+        <div class="sub-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <div class="sub-fi-info"><h4>多模型支持</h4><p>DeepSeek / GPT / Claude 自由切换</p></div>
+        </div>
+        <div class="sub-feature-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          <div class="sub-fi-info"><h4>自定义提示词</h4><p>保存常用提示模板，一键调用</p></div>
+        </div>
+      </div>
+      <div class="sub-cta-wrap">
+        <button class="sub-cta primary" onclick="subscribeFromScreen()">开始订阅</button>
+        <button class="sub-cta secondary" onclick="showToast('已恢复购买')">恢复购买</button>
+      </div>
+      <div class="sub-terms">订阅自动续期，可随时取消。通过 App Store 处理付款。</div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ===== Screen: More ===== -->
+  <div class="screen" id="s-more">
+    <div class="nav-bar"><div class="nav-left"><span class="nav-title">更多</span></div><div class="nav-right"></div></div>
+    <div style="flex:1;overflow-y:auto;padding:16px;">
+      <div class="settings-sec">
+        <div class="settings-sec-title">开发工具</div>
+        <div class="tools-content" style="padding:0;grid-template-columns:1fr 1fr;">
+          <div class="tool-card" onclick="showToolCard('SSH 终端')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <span class="t-label">SSH 终端</span><span class="t-count">3 台服务器</span>
+          </div>
+          <div class="tool-card" onclick="showToolCard('Notebook')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span class="t-label">Notebook</span><span class="t-count">.ipynb 编辑器</span>
+          </div>
+          <div class="tool-card" onclick="showToolCard('Scene')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+            <span class="t-label">Scene</span><span class="t-count">图形 & 动画</span>
+          </div>
+          <div class="tool-card" onclick="showToolCard('MiniApp')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <span class="t-label">MiniApp</span><span class="t-count">用 Python 做 App</span>
+          </div>
+          <div class="tool-card" onclick="showToolCard('工具集')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+            <span class="t-label">工具集</span><span class="t-count">JSON/QR/Base64</span>
+          </div>
+          <div class="tool-card" onclick="switchTab('settings')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="t-label">设置</span><span class="t-count">皮肤 · 订阅 · 环境</span>
+          </div>
+        </div>
+      </div>
+      <div class="settings-sec" style="margin-top:8px;">
+        <div class="settings-sec-title">状态</div>
+        <div class="settings-group">
+          <div class="settings-item" onclick="showToast('Python 版本 3.13.1')">
+            <div class="settings-sicon" style="background:var(--accent-dim);color:var(--accent);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16"/></svg></div>
+            <span class="settings-label">Python 版本</span><span class="settings-val">3.13.1</span><span class="settings-arrow">›</span>
+          </div>
+          <div class="settings-item" onclick="showToast('42 个包已安装')">
+            <div class="settings-sicon" style="background:oklch(40% 0.18 145 / 0.3);color:var(--success);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
+            <span class="settings-label">已安装包</span><span class="settings-val">42 个</span><span class="settings-arrow">›</span>
+          </div>
+          <div class="settings-item" onclick="showToast('156 MB 已用')">
+            <div class="settings-sicon" style="background:oklch(40% 0.16 85 / 0.3);color:var(--warn);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
+            <span class="settings-label">储存空间</span><span class="settings-val">156 MB</span><span class="settings-arrow">›</span>
+          </div>
+        </div>
+      </div>
+      <div class="settings-footer"><p>PythonIDE · v2.0</p><p style="font-size:10px;color:var(--muted2);display:flex;justify-content:center;gap:16px;margin-top:6px;"><span>隐私政策</span><span>用户协议</span><span>帮助</span></p></div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ===== Screen: SSH Terminal ===== -->
+  <div class="screen" id="s-ssh">
+    <div class="nav-bar">
+      <div class="nav-left"><button class="nav-btn" onclick="switchTab('more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button></div>
+      <div class="nav-title">SSH 终端</div>
+      <div class="nav-right"><button class="nav-btn" onclick="sshAddServer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg></button></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px;">
+      <div id="ssh-server-list"></div>
+      <div id="ssh-connected-view" style="display:none;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;"></span>
+          <span id="ssh-current-server" style="font-size:13px;color:var(--muted);flex:1;"></span>
+          <button onclick="sshDisconnect()" style="background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;padding:4px 8px;border-radius:6px;">断开</button>
+        </div>
+        <div id="ssh-output" style="background:var(--code-bg);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:var(--font-mono);font-size:13px;min-height:200px;max-height:300px;overflow-y:auto;margin-bottom:12px;color:var(--fg);white-space:pre-wrap;line-height:1.6;"></div>
+        <div style="display:flex;gap:8px;">
+          <input id="ssh-input" type="text" placeholder="输入命令，按回车执行" style="flex:1;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--fg);font-size:14px;font-family:var(--font-mono);outline:none;" onkeydown="if(event.key==='Enter')sshRunCmd()">
+          <button onclick="sshRunCmd()" style="padding:10px 16px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;cursor:pointer;">执行</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: Notebook ===== -->
+  <div class="screen" id="s-notebook">
+    <div class="nav-bar">
+      <div class="nav-left"><button class="nav-btn" onclick="switchTab('more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button></div>
+      <div class="nav-title">Notebook</div>
+      <div class="nav-right"><button class="nav-btn" onclick="nbAddCell()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg></button></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px;" id="nb-cells"></div>
+  </div>
+
+  <!-- ===== Screen: Scene ===== -->
+  <div class="screen" id="s-scene">
+    <div class="nav-bar">
+      <div class="nav-left"><button class="nav-btn" onclick="switchTab('more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button></div>
+      <div class="nav-title">Scene 画布</div>
+      <div class="nav-right"><button class="nav-btn" onclick="sceneRunScript()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></button></div>
+    </div>
+    <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;padding:12px;gap:10px;">
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="scene-tool active" data-tool="rect" onclick="sceneSetTool(this)">矩形</button>
+        <button class="scene-tool" data-tool="circle" onclick="sceneSetTool(this)">圆形</button>
+        <button class="scene-tool" data-tool="line" onclick="sceneSetTool(this)">直线</button>
+        <button class="scene-tool" data-tool="text" onclick="sceneSetTool(this)">文字</button>
+        <button class="scene-tool" onclick="sceneClear()" style="margin-left:auto;color:var(--danger);">清空</button>
+      </div>
+      <canvas id="scene-canvas" width="350" height="240" style="background:var(--surface2);border-radius:12px;border:1px solid var(--border);cursor:crosshair;"></canvas>
+      <textarea id="scene-script" placeholder="# Scene Python 脚本示例:
+from scene import Rect, Circle, Text, Line
+
+Rect(20, 20, 100, 60, color='#34d399', radius=8)
+Circle(280, 100, 50, color='#f87171', fill=True)
+Text(120, 190, 'Hello Scene!', size=24, color='#60a5fa')
+Line(20, 210, 330, 210, width=2, color='#a78bfa')" style="flex:1;min-height:120px;padding:12px;background:var(--code-bg);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-size:12px;font-family:var(--font-mono);outline:none;resize:none;line-height:1.6;"></textarea>
+    </div>
+  </div>
+
+  <!-- ===== Screen: MiniApp ===== -->
+  <div class="screen" id="s-miniapp">
+    <div class="nav-bar">
+      <div class="nav-left"><button class="nav-btn" onclick="switchTab('more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button></div>
+      <div class="nav-title">MiniApp</div>
+      <div class="nav-right"><button class="nav-btn" onclick="miniRun()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></button></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
+      <div class="settings-sec-title" style="padding:0;">模板</div>
+      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;">
+        <div class="mini-template active" data-template="counter" onclick="miniSelectTemplate(this)" style="min-width:100px;padding:12px;background:var(--surface2);border-radius:12px;border:2px solid var(--accent);cursor:pointer;text-align:center;">
+          <div style="margin-bottom:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:28px;height:28px;color:var(--accent);"><path stroke-linecap="round" stroke-linejoin="round" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/></svg></div>
+          <div style="font-size:12px;color:var(--fg);">计数器</div>
+        </div>
+        <div class="mini-template" data-template="todo" onclick="miniSelectTemplate(this)" style="min-width:100px;padding:12px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);cursor:pointer;text-align:center;">
+          <div style="margin-bottom:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:28px;height:28px;color:var(--fn);"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg></div>
+          <div style="font-size:12px;color:var(--fg);">待办事项</div>
+        </div>
+        <div class="mini-template" data-template="weather" onclick="miniSelectTemplate(this)" style="min-width:100px;padding:12px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);cursor:pointer;text-align:center;">
+          <div style="margin-bottom:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:28px;height:28px;color:var(--warn);"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg></div>
+          <div style="font-size:12px;color:var(--fg);">天气</div>
+        </div>
+      </div>
+      <div class="settings-sec-title" style="padding:0;">代码编辑</div>
+      <textarea id="mini-editor" style="flex:1;min-height:200px;padding:12px;background:var(--code-bg);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-size:13px;font-family:var(--font-mono);outline:none;resize:none;line-height:1.6;" placeholder="# MiniApp Python 代码..."></textarea>
+      <div class="settings-sec-title" style="padding:0;">预览</div>
+      <div id="mini-preview" style="height:200px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;overflow:hidden;position:relative;"></div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: 工具集 ===== -->
+  <div class="screen" id="s-tools">
+    <div class="nav-bar">
+      <div class="nav-left"><button class="nav-btn" onclick="switchTab('more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button></div>
+      <div class="nav-title">工具集</div>
+      <div class="nav-right"></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px;">
+      <div class="settings-sec">
+        <div class="settings-sec-title">JSON 格式化</div>
+        <textarea id="tools-json-in" placeholder="输入 JSON 内容..." style="width:100%;min-height:80px;padding:12px;background:var(--code-bg);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-size:13px;font-family:var(--font-mono);outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button onclick="toolsFormatJson()" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;cursor:pointer;">格式化</button>
+          <button onclick="toolsMinifyJson()" style="flex:1;padding:10px;background:var(--surface2);color:var(--fg);border:1px solid var(--border);border-radius:10px;font-size:14px;cursor:pointer;">压缩</button>
+        </div>
+        <textarea id="tools-json-out" readonly placeholder="格式化结果..." style="width:100%;min-height:80px;padding:12px;margin-top:8px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-size:13px;font-family:var(--font-mono);outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+      </div>
+      <div class="settings-sec">
+        <div class="settings-sec-title">QR 码生成</div>
+        <input id="tools-qr-input" type="text" placeholder="输入文本或链接" style="width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-size:14px;outline:none;box-sizing:border-box;">
+        <button onclick="toolsGenQR()" style="width:100%;margin-top:8px;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;cursor:pointer;">生成 QR 码</button>
+        <div id="tools-qr-output" style="margin-top:12px;display:none;flex-direction:column;align-items:center;gap:8px;">
+          <canvas id="tools-qr-canvas" width="160" height="160" style="border-radius:8px;border:1px solid var(--border);"></canvas>
+          <button onclick="toolsSaveQR()" style="padding:8px 16px;background:var(--surface2);color:var(--fg);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;">保存图片</button>
+        </div>
+      </div>
+      <div class="settings-sec">
+        <div class="settings-sec-title">Base64 编解码</div>
+        <textarea id="tools-b64-in" placeholder="输入文本..." style="width:100%;min-height:60px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-size:13px;font-family:var(--font-mono);outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button onclick="toolsEncode64()" style="flex:1;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;cursor:pointer;">编码</button>
+          <button onclick="toolsDecode64()" style="flex:1;padding:10px;background:var(--surface2);color:var(--fg);border:1px solid var(--border);border-radius:10px;font-size:14px;cursor:pointer;">解码</button>
+        </div>
+        <textarea id="tools-b64-out" readonly placeholder="结果..." style="width:100%;min-height:60px;padding:12px;margin-top:8px;background:var(--code-bg);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-size:13px;font-family:var(--font-mono);outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-item" data-tab="files" onclick="switchTab('files')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+      <span>文件</span>
+    </button>
+    <button class="tab-item active" data-tab="editor" onclick="switchTab('editor')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+      <span>编辑</span>
+    </button>
+    <button class="tab-item" data-tab="terminal" onclick="switchTab('terminal')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      <span>终端</span>
+    </button>
+    <button class="tab-item" data-tab="ai" onclick="switchTab('ai')" id="tab-ai">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+      <span>AI</span>
+    </button>
+    <button class="tab-item" data-tab="more" onclick="switchTab('more')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
+      <span>更多</span>
+    </button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ===== New Folder Modal ===== -->
+  <div class="modal-overlay" id="modal-newfolder" onclick="if(event.target===this)closeNewFolder()">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" style="text-align:center;font-size:17px;font-weight:600;padding:0 20px 12px;">新建文件夹</div>
+      <div style="padding:0 20px 16px;">
+        <input type="text" id="newfolder-name" placeholder="文件夹名称" style="width:100%;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-size:15px;outline:none;font-family:var(--font-body);">
+      </div>
+      <div class="modal-item" onclick="doNewFolder()" style="border-top:1px solid var(--border);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+        <div><div class="m-label">创建</div><div class="m-sub">在项目根目录下新建文件夹</div></div>
+      </div>
+      <div class="modal-item" onclick="closeNewFolder()" style="color:var(--muted);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        <div class="m-label">取消</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== New File Modal ===== -->
+  <div class="modal-overlay" id="modal-newfile" onclick="if(event.target===this)closeNewFile()">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" style="text-align:center;font-size:17px;font-weight:600;padding:0 20px 12px;">新建文件</div>
+      <div style="padding:0 20px 12px;">
+        <input type="text" id="newfile-name" placeholder="文件名，例如 main.py" style="width:100%;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-size:15px;outline:none;font-family:var(--font-body);margin-bottom:12px;">
+        <div style="display:flex;gap:8px;">
+          <div class="filetype-btn active" data-type="py" onclick="selectFiletype(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16"/></svg>
+            Python
+          </div>
+          <div class="filetype-btn" data-type="json" onclick="selectFiletype(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+            JSON
+          </div>
+          <div class="filetype-btn" data-type="md" onclick="selectFiletype(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Markdown
+          </div>
+          <div class="filetype-btn" data-type="txt" onclick="selectFiletype(this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Text
+          </div>
+        </div>
+      </div>
+      <div class="modal-item" onclick="doNewFile()" style="border-top:1px solid var(--border);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        <div><div class="m-label">创建</div><div class="m-sub">在项目根目录下新建文件</div></div>
+      </div>
+      <div class="modal-item" onclick="closeNewFile()" style="color:var(--muted);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        <div class="m-label">取消</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Context Menu Overlay ===== -->
+  <div class="modal-overlay" id="modal-ctx" onclick="if(event.target===this)closeCtx()">
+    <div class="modal-sheet ctx-sheet" id="ctx-sheet">
+      <div class="modal-handle"></div>
+      <div class="ctx-target-name" id="ctx-name" style="text-align:center;font-size:13px;color:var(--muted);padding:0 20px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+      <div class="modal-item" onclick="ctxRename()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        <div><div class="m-label">重命名</div></div>
+      </div>
+      <div class="modal-item" onclick="ctxCopy()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+        <div><div class="m-label">复制</div></div>
+      </div>
+      <div class="modal-item" onclick="ctxDelete()" style="color:var(--danger);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--danger);"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        <div><div class="m-label">删除</div></div>
+      </div>
+      <div class="modal-item" onclick="closeCtx()" style="color:var(--muted);border-top:1px solid var(--border);margin-top:4px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        <div class="m-label">取消</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Rename Modal ===== -->
+  <div class="modal-overlay" id="modal-rename" onclick="if(event.target===this)closeRename()">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title" style="text-align:center;font-size:17px;font-weight:600;padding:0 20px 12px;">重命名</div>
+      <div style="padding:0 20px 16px;">
+        <input type="text" id="rename-input" style="width:100%;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-size:15px;outline:none;font-family:var(--font-body);" onkeydown="if(event.key==='Enter')doRename()">
+      </div>
+      <div class="modal-item" onclick="doRename()" style="border-top:1px solid var(--border);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        <div class="m-label">确认</div>
+      </div>
+      <div class="modal-item" onclick="closeRename()" style="color:var(--muted);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        <div class="m-label">取消</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var code = [
+    'import numpy as np',
+    'import matplotlib.pyplot as plt',
+    'from datetime import datetime',
+    '',
+    'def fibonacci(n):',
+    '    if n <= 1:',
+    '        return n',
+    '    return fibonacci(n-1) + fibonacci(n-2)',
+    '',
+    'def bench(n=35):',
+    '    start = datetime.now()',
+    '    result = fibonacci(n)',
+    '    elapsed = datetime.now() - start',
+    '    print(f"fib({n}) = {result}")',
+    '    print(f"took {elapsed.total_seconds():.2f}s")',
+    '',
+    'if __name__ == "__main__":',
+    '    bench(35)',
+    '',
+    'class DataProcessor:',
+    '    def __init__(self, data):',
+    '        self.data = np.array(data)',
+    '    def stats(self):',
+    '        return {',
+    '            "mean": self.data.mean(),',
+    '            "std": self.data.std(),',
+    '            "max": self.data.max(),',
+    '        }',
+  ];
+  function highlight(line) {
+    var h = line;
+    var strs = [];
+    h = h.replace(/"([^"]*)"/g, function(m){strs.push(m);return '\x00S'+strs.length+'\x00';});
+    h = h.replace(/'([^']*)'/g, function(m){strs.push(m);return '\x00S'+strs.length+'\x00';});
+    h = h.replace(/\b(import|as|from|def|if|elif|else|for|while|return|class|try|except|finally|with|pass|break|continue|and|or|not|in|is|lambda|yield|raise|global|nonlocal|assert|del)\b/g, '<span class="kw">$1</span>');
+    h = h.replace(/\b(print|range|len|int|str|float|list|dict|set|tuple|open|input|isinstance|enumerate|zip|map|filter|sorted|reversed|abs|max|min|sum|any|all|super|property|staticmethod|classmethod|isinstance|hasattr|getattr|setattr|type|True|False|None)\b/g, '<span class="fn">$1</span>');
+    h = h.replace(/\b(np|plt|datetime)\b/g, '<span class="bui">$1</span>');
+    h = h.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+    h = h.replace(/#.*/g, '<span class="com">$&</span>');
+    h = h.replace(/\b(self|cls)\b/g, '<span class="self">$1</span>');
+    h = h.replace(/\x00S(\d+)\x00/g, function(_,n){return '<span class="str">'+strs[+n-1]+'</span>';});
+    return h;
+  }
+  var html = '', nums = '';
+  code.forEach(function (line) { html += highlight(line) + '\n'; });
+  for (var i = 1; i <= code.length; i++) nums += i + '\n';
+  document.getElementById('code-wrap').innerHTML = html;
+  document.getElementById('line-nums').textContent = nums;
+  function updateClock() {
+    var d = new Date();
+    document.getElementById('status-time').textContent = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+})();
+
+/* ===== FileSystem Data Model ===== */
+var FS = {
+  'my_project': { type: 'folder', meta: '文件夹 · 12 个文件' },
+  'main.py': { type: 'py', meta: 'Python · 2.4 KB · 刚刚', content: [
+    'import numpy as np',
+    'import matplotlib.pyplot as plt',
+    'from datetime import datetime',
+    '',
+    'def fibonacci(n):',
+    '    if n <= 1:',
+    '        return n',
+    '    return fibonacci(n-1) + fibonacci(n-2)',
+    '',
+    'def bench(n=35):',
+    '    start = datetime.now()',
+    '    result = fibonacci(n)',
+    '    elapsed = datetime.now() - start',
+    '    print(f"fib({n}) = {result}")',
+    '    print(f"took {elapsed.total_seconds():.2f}s")',
+    '',
+    'if __name__ == "__main__":',
+    '    bench(35)',
+    '',
+    'class DataProcessor:',
+    '    def __init__(self, data):',
+    '        self.data = np.array(data)',
+    '    def stats(self):',
+    '        return {',
+    '            "mean": self.data.mean(),',
+    '            "std": self.data.std(),',
+    '            "max": self.data.max(),',
+    '        }',
+  ]},
+  'utils.py': { type: 'py', meta: 'Python · 1.1 KB · 今天 15:32', content: [
+    'def read_file(path):',
+    '    with open(path, "r") as f:',
+    '        return f.read()',
+    '',
+    'def write_file(path, content):',
+    '    with open(path, "w") as f:',
+    '        f.write(content)',
+    '',
+    'def merge_dicts(*dicts):',
+    '    result = {}',
+    '    for d in dicts:',
+    '        result.update(d)',
+    '    return result',
+    '',
+    'def format_size(bytes_num):',
+    '    for unit in ["B","KB","MB","GB"]:',
+    '        if abs(bytes_num) < 1024:',
+    '            return f"{bytes_num:.1f} {unit}"',
+    '        bytes_num /= 1024',
+    '    return f"{bytes_num:.1f} TB"',
+  ]},
+  'notebook.ipynb': { type: 'json', meta: 'Notebook · 8.6 KB · 今天', content: [
+    '{',
+    '  "cells": [',
+    '    {',
+    '      "cell_type": "code",',
+    '      "outputs": [],',
+    '      "source": ["import pandas as pd"]',
+    '    }',
+    '  ],',
+    '  "metadata": {},',
+    '  "nbformat": 4,',
+    '  "nbformat_minor": 5',
+    '}',
+  ]},
+  'config.json': { type: 'json', meta: 'JSON · 256 B · 昨天', content: [
+    '{',
+    '  "name": "python-ide",',
+    '  "version": "2.0.0",',
+    '  "python": "3.13.1",',
+    '  "theme": "emerald",',
+    '  "fontSize": 14,',
+    '  "tabSize": 4,',
+    '  "autoSave": true,',
+    '  "linting": true',
+    '}',
+  ]},
+  'data': { type: 'folder', meta: '文件夹 · 5 个文件' },
+  'users.json': { type: 'json', meta: 'JSON · 3.2 KB · 3 天前', content: [
+    '[',
+    '  {"id": 1, "name": "Alice", "role": "admin"},',
+    '  {"id": 2, "name": "Bob", "role": "editor"},',
+    '  {"id": 3, "name": "Carol", "role": "viewer"}',
+    ']',
+  ]},
+  'README.md': { type: 'md', meta: 'Markdown · 1.8 KB', content: [
+    '# Python IDE',
+    '',
+    'A powerful Python development environment for iOS.',
+    '',
+    '## Features',
+    '',
+    '- Syntax highlighting',
+    '- Code completion',
+    '- AI assistant',
+    '- SSH terminal',
+    '',
+    '## Getting Started',
+    '',
+    '```bash',
+    'pip install -r requirements.txt',
+    'python main.py',
+    '```',
+  ]},
+  'requirements.txt': { type: 'txt', meta: 'Text · 128 B', content: ['numpy>=1.24.0', 'matplotlib>=3.7.0', 'pandas>=2.0.0'] },
+  'screenshot.png': { type: 'img', meta: 'PNG · 2.1 MB' },
+};
+
+function fsGet(name) { return FS[name]; }
+function fsHas(name) { return FS.hasOwnProperty(name); }
+function fsSet(name, data) { FS[name] = data; }
+function fsDel(name) { delete FS[name]; }
+function fsRename(oldName, newName) {
+  var data = FS[oldName];
+  delete FS[oldName];
+  FS[newName] = data;
+}
+function fsCopy(name) {
+  var data = FS[name];
+  if (!data) return;
+  var copyName = name.replace(/(\.[^.]+)$/, '_copy$1');
+  var i = 1;
+  while (FS[copyName]) {
+    copyName = name.replace(/(\.[^.]+)$/, '_copy' + i + '$1');
+    i++;
+  }
+  FS[copyName] = JSON.parse(JSON.stringify(data));
+  if (Array.isArray(data.content)) {
+    FS[copyName].content = data.content.slice();
+  }
+  renderFiles();
+  showToast('已复制为 ' + copyName);
+}
+function fsList() { return Object.keys(FS); }
+
+function getFileIcon(type) {
+  var icons = {
+    folder: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>',
+    py: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>',
+    json: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>',
+    md: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>',
+    txt: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>',
+    yml: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16"/></svg>',
+    img: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>',
+  };
+  return icons[type] || icons.txt;
+}
+
+function renderFiles() {
+  var list = document.getElementById('files-list');
+  if (!list) return;
+  var sections = { folder: [], py: [], json: [], md: [], txt: [], img: [], yml: [], other: [] };
+  Object.keys(FS).forEach(function(name) {
+    var f = FS[name];
+    var ext = name.split('.').pop();
+    var section = 'other';
+    if (f.type === 'folder') section = 'folder';
+    else if (f.type === 'py') section = 'py';
+    else if (f.type === 'json') section = 'json';
+    else if (f.type === 'md') section = 'md';
+    else if (f.type === 'txt') section = 'txt';
+    else if (f.type === 'img') section = 'img';
+    else if (f.type === 'yml') section = 'yml';
+    sections[section].push({ name: name, data: f });
+  });
+  var html = '';
+  var secNames = { folder: '文件夹', py: 'Python', json: 'JSON / Notebook', md: 'Markdown', txt: '文本', img: '图片', yml: 'YAML', other: '其他' };
+  Object.keys(secNames).forEach(function(sec) {
+    if (sections[sec].length === 0) return;
+    html += '<div class="file-section-label">' + secNames[sec] + '</div>';
+    sections[sec].forEach(function(item) {
+      var f = item.data;
+      var isFolder = f.type === 'folder';
+      var onclick = isFolder ? '' : 'onclick="openFile(\'' + item.name.replace(/'/g, "\\'") + '\')"';
+      html += '<div class="file-row" data-name="' + item.name.replace(/"/g, '&quot;') + '" ' + onclick + '>';
+      html += '<div class="f-icon ' + f.type + '">' + getFileIcon(f.type) + '</div>';
+      html += '<div class="f-info"><div class="f-name">' + item.name + '</div><div class="f-meta">' + f.meta + '</div></div>';
+      html += '<div class="f-more" onclick="event.stopPropagation();showCtx(\'' + item.name.replace(/'/g, "\\'") + '\')"></div>';
+      html += '<div class="swipe-bg del" onclick="event.stopPropagation();fsSwipeDel(\'' + item.name.replace(/'/g, "\\'") + '\')">删除</div>';
+      html += '</div>';
+    });
+  });
+  list.innerHTML = html;
+  initSwipe();
+}
+
+/* ===== New Folder Modal ===== */
+function openNewFolder() {
+  document.getElementById('newfolder-name').value = '';
+  document.getElementById('modal-newfolder').classList.add('open');
+}
+function closeNewFolder() {
+  document.getElementById('modal-newfolder').classList.remove('open');
+}
+function doNewFolder() {
+  var name = document.getElementById('newfolder-name').value.trim();
+  if (!name) { showToast('请输入文件夹名称'); return; }
+  if (FS[name]) { showToast('同名文件夹已存在'); return; }
+  FS[name] = { type: 'folder', meta: '文件夹 · 0 个文件' };
+  closeNewFolder();
+  renderFiles();
+  showToast('已创建文件夹: ' + name);
+}
+
+/* ===== New File Modal ===== */
+var selectedFileType = 'py';
+function selectFiletype(btn) {
+  document.querySelectorAll('.filetype-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  selectedFileType = btn.getAttribute('data-type');
+}
+function openNewFile() {
+  document.getElementById('newfile-name').value = '';
+  document.querySelectorAll('.filetype-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelector('.filetype-btn[data-type="py"]').classList.add('active');
+  selectedFileType = 'py';
+  document.getElementById('modal-newfile').classList.add('open');
+}
+function closeNewFile() {
+  document.getElementById('modal-newfile').classList.remove('open');
+}
+function doNewFile() {
+  var name = document.getElementById('newfile-name').value.trim();
+  if (!name) { showToast('请输入文件名称'); return; }
+  var ext = selectedFileType;
+  if (name.indexOf('.') === -1) name += '.' + ext;
+  if (FS[name]) { showToast('同名文件已存在'); return; }
+  var content = [''];
+  if (ext === 'py') content = ['# ' + name, '', 'def main():', '    pass', '', 'if __name__ == "__main__":', '    main()'];
+  else if (ext === 'json') content = ['{', '  "name": "' + name + '",', '  "version": "1.0.0"', '}'];
+  else if (ext === 'md') content = ['# ' + name, '', 'Write your content here...'];
+  else if (ext === 'txt') content = [''];
+  FS[name] = { type: ext, meta: ext.toUpperCase() + ' · 0 B', content: content };
+  closeNewFile();
+  renderFiles();
+  showToast('已创建文件: ' + name);
+}
+
+/* ===== Context Menu ===== */
+var ctxTarget = null;
+var renameTarget = null;
+function showCtx(name) {
+  ctxTarget = name;
+  document.getElementById('ctx-name').textContent = name;
+  document.getElementById('modal-ctx').classList.add('open');
+}
+function closeCtx() {
+  document.getElementById('modal-ctx').classList.remove('open');
+  ctxTarget = null;
+}
+function ctxRename() {
+  if (!ctxTarget) return;
+  renameTarget = ctxTarget;
+  var inp = document.getElementById('rename-input');
+  inp.value = ctxTarget;
+  closeCtx();
+  setTimeout(function() {
+    document.getElementById('modal-rename').classList.add('open');
+    inp.focus();
+    var dotIdx = renameTarget.lastIndexOf('.');
+    inp.setSelectionRange(0, dotIdx > 0 ? dotIdx : renameTarget.length);
+  }, 100);
+}
+function ctxCopy() {
+  if (!ctxTarget) return;
+  fsCopy(ctxTarget);
+  closeCtx();
+}
+function ctxDelete() {
+  if (!ctxTarget) return;
+  var name = ctxTarget;
+  closeCtx();
+  setTimeout(function() {
+    closeTab(name);
+    fsDel(name);
+    renderFiles();
+    showToast('已删除: ' + name);
+  }, 100);
+}
+function closeRename() {
+  document.getElementById('modal-rename').classList.remove('open');
+  renameTarget = null;
+}
+function doRename() {
+  var inp = document.getElementById('rename-input');
+  var newName = inp.value.trim();
+  if (!newName) { showToast('请输入新名称'); return; }
+  if (!renameTarget) { showToast('重命名目标无效'); return; }
+  if (FS[newName] && newName !== renameTarget) { showToast('同名文件已存在'); return; }
+  fsRename(renameTarget, newName);
+  closeRename();
+  renderFiles();
+  showToast('已重命名: ' + renameTarget + ' → ' + newName);
+}
+
+/* ===== Swipe to Delete ===== */
+function initSwipe() {
+  var rows = document.querySelectorAll('.file-row');
+  rows.forEach(function(row) {
+    row.removeEventListener('touchstart', swipeStart, { passive: true });
+    row.removeEventListener('touchmove', swipeMove, { passive: true });
+    row.removeEventListener('touchend', swipeEnd, { passive: true });
+    row.addEventListener('touchstart', swipeStart, { passive: true });
+    row.addEventListener('touchmove', swipeMove, { passive: true });
+    row.addEventListener('touchend', swipeEnd, { passive: true });
+  });
+}
+var swipeState = {};
+function swipeStart(e) {
+  var row = e.currentTarget;
+  swipeState[row.dataset.name] = { startX: e.touches[0].clientX, translated: false };
+}
+function swipeMove(e) {
+  var row = e.currentTarget;
+  var state = swipeState[row.dataset.name];
+  if (!state) return;
+  var dx = e.touches[0].clientX - state.startX;
+  if (dx < -10 && !state.translated) {
+    state.translated = true;
+    closeAllSwipes();
+    row.style.transition = 'none';
+    row.style.transform = 'translateX(-80px)';
+  } else if (state.translated) {
+    var tx = Math.max(-100, Math.min(0, -80 + dx + 80));
+    row.style.transition = 'none';
+    row.style.transform = 'translateX(' + tx + 'px)';
+  }
+}
+function swipeEnd(e) {
+  var row = e.currentTarget;
+  var state = swipeState[row.dataset.name];
+  if (!state || !state.translated) return;
+  var tx = parseFloat(row.style.transform.replace('translateX(', '').replace('px)', '')) || 0;
+  if (tx < -40) {
+    row.style.transition = 'transform 0.25s cubic-bezier(0.32, 0.94, 0.6, 1)';
+    row.style.transform = 'translateX(-80px)';
+  } else {
+    row.style.transition = 'transform 0.25s cubic-bezier(0.32, 0.94, 0.6, 1)';
+    row.style.transform = 'translateX(0)';
+  }
+}
+function closeAllSwipes() {
+  document.querySelectorAll('.file-row').forEach(function(r) {
+    r.style.transition = 'transform 0.2s';
+    r.style.transform = 'translateX(0)';
+  });
+}
+function fsSwipeDel(name) {
+  closeTab(name);
+  fsDel(name);
+  renderFiles();
+  showToast('已删除: ' + name);
+}
+
+/* ===== More Page Tool Cards ===== */
+function showToolCard(name) {
+  var map = {
+    'SSH 终端': 'ssh',
+    'Notebook': 'notebook',
+    'Scene': 'scene',
+    'MiniApp': 'miniapp',
+    '工具集': 'tools',
+  };
+  var tab = map[name];
+  if (tab) {
+    document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
+    var t = document.getElementById('s-' + tab);
+    if (t) t.classList.add('active');
+    if (tab === 'ssh') sshRenderServers();
+    if (tab === 'notebook') nbInit();
+    if (tab === 'miniapp') miniSelectTemplate(document.querySelector('.mini-template[data-template="counter"]'));
+  }
+}
+
+/* ===== Settings Real Feedback ===== */
+function showSettingsInfo(key) {
+  var messages = {
+    python: 'Python 3.13.1 已安装，共 42 个包',
+    packages: '已安装 42 个包：numpy, matplotlib, pandas 等',
+    storage: '项目共占用 156 MB 存储空间',
+  };
+  showToast(messages[key] || '信息已更新');
+}
+
+
+/* ===== Multi-file Editor Content ===== */
+var FILE_CONTENTS = {
+  'main.py': [
+    'import numpy as np',
+    'import matplotlib.pyplot as plt',
+    'from datetime import datetime',
+    '',
+    'def fibonacci(n):',
+    '    if n <= 1:',
+    '        return n',
+    '    return fibonacci(n-1) + fibonacci(n-2)',
+    '',
+    'def bench(n=35):',
+    '    start = datetime.now()',
+    '    result = fibonacci(n)',
+    '    elapsed = datetime.now() - start',
+    '    print(f"fib({n}) = {result}")',
+    '    print(f"took {elapsed.total_seconds():.2f}s")',
+    '',
+    'if __name__ == "__main__":',
+    '    bench(35)',
+    '',
+    'class DataProcessor:',
+    '    def __init__(self, data):',
+    '        self.data = np.array(data)',
+    '    def stats(self):',
+    '        return {',
+    '            "mean": self.data.mean(),',
+    '            "std": self.data.std(),',
+    '            "max": self.data.max(),',
+    '        }',
+  ],
+  'utils.py': [
+    'def read_file(path):',
+    '    with open(path, "r") as f:',
+    '        return f.read()',
+    '',
+    'def write_file(path, content):',
+    '    with open(path, "w") as f:',
+    '        f.write(content)',
+    '',
+    'def merge_dicts(*dicts):',
+    '    result = {}',
+    '    for d in dicts:',
+    '        result.update(d)',
+    '    return result',
+    '',
+    'def format_size(bytes_num):',
+    '    for unit in ["B","KB","MB","GB"]:',
+    '        if abs(bytes_num) < 1024:',
+    '            return f"{bytes_num:.1f} {unit}"',
+    '        bytes_num /= 1024',
+    '    return f"{bytes_num:.1f} TB"',
+  ],
+  'config.json': [
+    '{',
+    '  "name": "python-ide",',
+    '  "version": "2.0.0",',
+    '  "python": "3.13.1",',
+    '  "theme": "emerald",',
+    '  "fontSize": 14,',
+    '  "tabSize": 4,',
+    '  "autoSave": true,',
+    '  "linting": true',
+    '}',
+  ],
+  'notebook.ipynb': [
+    '{',
+    '  "cells": [',
+    '    {',
+    '      "cell_type": "code",',
+    '      "outputs": [],',
+    '      "source": ["import pandas as pd"]',
+    '    }',
+    '  ],',
+    '  "metadata": {},',
+    '  "nbformat": 4,',
+    '  "nbformat_minor": 5',
+    '}',
+  ],
+};
+
+function renderCode(name) {
+  var code = FILE_CONTENTS[name] || FS[name] && FS[name].content || [''];
+  var hlCode = code.join('\n');
+  function highlight(line) {
+    var h = line;
+    var strs = [];
+    h = h.replace(/"([^"]*)"/g, function(m){strs.push(m);return '\x00S'+strs.length+'\x00';});
+    h = h.replace(/'([^']*)'/g, function(m){strs.push(m);return '\x00S'+strs.length+'\x00';});
+    h = h.replace(/\b(import|as|from|def|if|elif|else|for|while|return|class|try|except|finally|with|pass|break|continue|and|or|not|in|is|lambda|yield|raise|global|nonlocal|assert|del)\b/g, '<span class="kw">$1</span>');
+    h = h.replace(/\b(print|range|len|int|str|float|list|dict|set|tuple|open|input|isinstance|enumerate|zip|map|filter|sorted|reversed|abs|max|min|sum|any|all|super|property|staticmethod|classmethod|isinstance|hasattr|getattr|setattr|type|True|False|None)\b/g, '<span class="fn">$1</span>');
+    h = h.replace(/\b(np|plt|datetime)\b/g, '<span class="bui">$1</span>');
+    h = h.replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+    h = h.replace(/#.*/g, '<span class="com">$&</span>');
+    h = h.replace(/\b(self|cls)\b/g, '<span class="self">$1</span>');
+    h = h.replace(/\x00S(\d+)\x00/g, function(_,n){return '<span class="str">'+strs[+n-1]+'</span>';});
+    return h;
+  }
+  var html = '', nums = '';
+  code.forEach(function(line) { html += highlight(line) + '\n'; });
+  for (var i = 1; i <= code.length; i++) nums += i + '\n';
+  document.getElementById('code-wrap').innerHTML = html;
+  document.getElementById('line-nums').textContent = nums;
+  document.querySelector('#s-editor .nav-title').textContent = name;
+}
+
+function switchToTab(tabName) {
+  document.querySelectorAll('.file-tab').forEach(function(t) { t.classList.remove('active'); });
+  var tab = document.querySelector('.file-tab[data-file="' + tabName + '"]');
+  if (tab) tab.classList.add('active');
+  renderCode(tabName);
+}
+
+/* ===== Open File (from files list) ===== */
+function openFile(name) {
+  switchTab('editor');
+  renderCode(name);
+  document.querySelectorAll('#files-list .file-row').forEach(function(r) { r.classList.remove('active'); });
+  var row = document.querySelector('#files-list .file-row[data-name="' + name.replace(/"/g, '') + '"]');
+  if (row) row.classList.add('active');
+  var tab = document.querySelector('.file-tab[data-file="' + name + '"]');
+  if (!tab) {
+    addFileTab(name);
+  } else {
+    switchToTab(name);
+  }
+  showToast('打开 ' + name);
+}
+
+/* ===== File Tab Management ===== */
+function addFileTab(name) {
+  var tabs = document.querySelector('.file-tabs');
+  var tab = document.createElement('div');
+  tab.className = 'file-tab active';
+  tab.setAttribute('data-file', name);
+  var icon = FS[name] && FS[name].type === 'folder' ? 'folder' : 'py';
+  if (FS[name]) {
+    if (FS[name].type === 'json' || FS[name].type === 'img') icon = 'json';
+    if (FS[name].type === 'md') icon = 'md';
+    if (FS[name].type === 'txt') icon = 'txt';
+  }
+  var iconSVG = getFileIcon(icon).replace('width="20"', 'width="14"').replace('height="20"', 'height="14"');
+  tab.innerHTML = iconSVG + ' ' + name + ' <span class="f-close" onclick="event.stopPropagation();closeTab(\'' + name.replace(/'/g, "\\'") + '\')">&times;</span>';
+  tab.onclick = function(e) { if (e.target.className !== 'f-close') switchToTab(name); };
+  document.querySelectorAll('.file-tab').forEach(function(t) { t.classList.remove('active'); });
+  tabs.appendChild(tab);
+  switchToTab(name);
+}
+function closeTab(name) {
+  var tab = document.querySelector('.file-tab[data-file="' + name + '"]');
+  if (!tab) return;
+  var wasActive = tab.classList.contains('active');
+  tab.parentNode.removeChild(tab);
+  if (wasActive) {
+    var remaining = document.querySelector('.file-tab');
+    if (remaining) switchToTab(remaining.getAttribute('data-file'));
+  }
+  showToast('已关闭 ' + name);
+}
+
+/* ===== Navigation ===== */
+var currentTab = 'editor';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); });
+  var t = document.getElementById('s-' + tab);
+  if (t) t.classList.add('active');
+  document.querySelectorAll('.tab-item').forEach(function (x) { x.classList.remove('active'); });
+  document.querySelectorAll('.tab-item').forEach(function (x) {
+    if (x.getAttribute('data-tab') === tab) x.classList.add('active');
+  });
+  if (tab === 'files') renderFiles();
+  if (tab === 'ai') updateAIBadge();
+}
+
+function switchOutTab(el) {
+  var p = el.parentElement;
+  Array.prototype.forEach.call(p.children, function (c) { c.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+var outputOpen = false;
+function toggleOutput() {
+  outputOpen = !outputOpen;
+  document.getElementById('output-panel').classList.toggle('open', outputOpen);
+}
+
+var splitMode = false;
+function toggleSplit() {
+  splitMode = !splitMode;
+  document.getElementById('editor-wrap').classList.toggle('split-active', splitMode);
+  showToast(splitMode ? '分栏模式' : '标准模式');
+}
+
+function switchTermSession(el) {
+  document.querySelectorAll('.term-session').forEach(function (s) { s.classList.remove('active'); });
+  el.classList.add('active');
+  var name = el.textContent.trim();
+  showToast('切换到: ' + name);
+  var body = document.getElementById('term-body');
+  if (name.indexOf('local') !== -1) {
+    body.innerHTML = '<div><span class="term-prompt">$</span> <span class="term-out">python --version</span></div><div><span class="term-out">Python 3.13.1</span></div><div><span class="term-prompt">$</span> <span class="term-out">python main.py</span></div><div><span class="term-out">Computing Fibonacci...</span></div><div><span class="term-out">fib(0) = 0 … fib(9) = 34</span></div><div><span class="ok">✓ 运行完成，0.09s</span></div>';
+  } else {
+    body.innerHTML = '<div><span class="term-prompt">$</span> <span class="term-out">ssh ' + name.replace('SSH: ', '') + '</span></div><div><span class="term-err">Connection refused</span></div><div><span class="term-out">提示：SSH 服务器未连接，请在设置中添加服务器信息</span></div>';
+  }
+}
+
+var termSessionCount = 3;
+function newTermSession() {
+  termSessionCount++;
+  var bar = document.querySelector('.term-session-bar');
+  var sessions = ['local', 'SSH: server01', 'SSH: dev-box'];
+  var names = ['local', 'server01', 'dev-box'];
+  var newName = 'SSH: session' + termSessionCount;
+  var div = document.createElement('div');
+  div.className = 'term-session';
+  div.setAttribute('data-session', newName);
+  div.innerHTML = '<span class="dot gray"></span> ' + newName;
+  div.onclick = function() { switchTermSession(div); };
+  bar.appendChild(div);
+  switchTermSession(div);
+  showToast('已新建会话: ' + newName);
+}
+
+var runCount = 0;
+function runCode() {
+  runCount++;
+  var body = document.getElementById('output-body');
+  body.innerHTML = '<span class="ok">❯</span> Running main.py...<br>';
+  if (!outputOpen) toggleOutput();
+  setTimeout(function () {
+    if (runCount % 3 === 0) {
+      body.innerHTML = '<span class="err">✗ RecursionError: maximum recursion depth exceeded<br>  File "main.py", line 9, in fibonacci<br>    return fibonacci(n-1) + fibonacci(n-2)</span>';
+      showToast('运行出错');
+    } else if (runCount % 3 === 2) {
+      body.innerHTML = '<span class="warn">⚠ matplotlib 未安装，跳过绘图</span><br><span class="ok">❯</span> fib(35) = 9227465<br><span class="ok">✓ 运行完成，0.32s</span>';
+      showToast('运行完成 (有警告)');
+    } else {
+      body.innerHTML = '<span class="ok">❯</span> Computing Fibonacci...<br>fib(0)=0 … fib(9)=34<br><span class="ok">✓ 运行完成，0.09s</span>';
+      showToast('运行成功');
+    }
+  }, 800);
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._hide);
+  t._hide = setTimeout(function () { t.classList.remove('show'); }, 1800);
+}
+
+function filterFiles(q) {
+  q = q.toLowerCase().trim();
+  document.querySelectorAll('#files-list .file-row').forEach(function (r) {
+    var n = (r.getAttribute('data-name') || '').toLowerCase();
+    r.style.display = (!q || n.includes(q)) ? '' : 'none';
+  });
+  var labels = document.querySelectorAll('#files-list .file-section-label');
+  labels.forEach(function(s) {
+    var hasVisible = false;
+    var sib = s.nextElementSibling;
+    while (sib && !sib.classList.contains('file-section-label')) {
+      if (sib.style.display !== 'none') hasVisible = true;
+      sib = sib.nextElementSibling;
+    }
+    s.style.display = hasVisible ? '' : 'none';
+  });
+}
+
+var termCwd = '/home/user/project';
+var termHistory = [];
+var termHistIdx = -1;
+var installedPkgs = ['numpy', 'pandas', 'matplotlib', 'requests', 'flask', 'django', 'fastapi', 'torch', 'tensorflow', 'pillow', 'opencv-python', 'scipy', 'sklearn', 'pytest', 'black', 'flake8', 'jupyter', 'ipython', 'pip', 'setuptools', 'wheel'];
+var gitFiles = {modified: ['main.py', 'utils.py'], untracked: ['new_feature.py', 'tests/test_main.py'], staged: []};
+var npmDeps = {'express': '^4.18.0', 'react': '^18.2.0', 'lodash': '^4.17.21'};
+
+var termFS = {
+  '/': ['home', 'usr', 'tmp', 'etc', 'var'],
+  '/home': ['user'],
+  '/home/user': ['project', 'documents', '.bashrc', '.profile'],
+  '/home/user/project': ['main.py', 'utils.py', 'config.json', 'requirements.txt', 'README.md', 'data', 'tests', '.git'],
+  '/home/user/project/data': ['sample.csv', 'input.txt', 'output.json'],
+  '/home/user/project/tests': ['test_main.py', 'test_utils.py', '__init__.py'],
+  '/home/user/project/.git': ['config', 'HEAD', 'objects'],
+  '/home/user/documents': ['notes.txt', 'todo.md'],
+  '/tmp': ['npm_cache', 'python_cache'],
+  '/usr': ['bin', 'lib', 'include'],
+  '/usr/bin': ['python3', 'python', 'pip', 'node', 'npm', 'git', 'ls', 'cd', 'cat', 'grep', 'awk', 'sed', 'curl', 'wget', 'top', 'ps', 'kill', 'chmod', 'chown', 'tar', 'zip', 'unzip']
+};
+
+var termFileContents = {
+  '/home/user/project/main.py': '# Fibonacci and factorial\nimport sys\n\ndef fib(n):\n    if n <= 1: return n\n    return fib(n-1) + fib(n-2)\n\ndef fact(n):\n    if n <= 1: return 1\n    return n * fact(n-1)\n\nif __name__ == "__main__":\n    n = int(sys.argv[1]) if len(sys.argv) > 1 else 10\n    print(f"fib({n}) = {fib(n)}")\n    print(f"fact({n}) = {fact(n)}")\n',
+  '/home/user/project/utils.py': 'def add(a, b):\n    return a + b\n\ndef sub(a, b):\n    return a - b\n\ndef mul(a, b):\n    return a * b\n\ndef div(a, b):\n    if b == 0: raise ValueError("Division by zero")\n    return a / b\n',
+  '/home/user/project/config.json': '{\n  "name": "python-ide-project",\n  "version": "1.0.0",\n  "python": "3.13",\n  "dependencies": {\n    "flask": "^3.0.0",\n    "requests": "^2.31.0"\n  }\n}\n',
+  '/home/user/project/requirements.txt': 'flask==3.0.0\nrequests==2.31.0\nnumpy==1.26.0\nmatplotlib==3.8.0\npandas==2.1.0\n',
+  '/home/user/project/README.md': '# Python IDE Project\n\nA sample project for Python IDE.\n\n## Installation\n\n    pip install -r requirements.txt\n\n## Usage\n\n    python main.py [n]\n',
+  '/home/user/project/data/sample.csv': 'name,age,city\nAlice,30,Beijing\nBob,25,Shanghai\nCharlie,35,Guangzhou\n',
+  '/home/user/documents/notes.txt': 'Meeting notes:\n- Discuss project timeline\n- Review code changes\n- Plan next sprint\n',
+  '/home/user/.bashrc': '# ~/.bashrc\nalias ll="ls -la"\nalias gs="git status"\nexport PATH="$HOME/bin:$PATH"\n'
+};
+
+function termPathJoin(base, path) {
+  if (path.startsWith('/')) return path;
+  var parts = (base === '/' ? '' : base).split('/').filter(Boolean);
+  path.split('/').forEach(function(p) {
+    if (p === '..') parts.pop();
+    else if (p !== '.' && p !== '') parts.push(p);
+  });
+  return '/' + parts.join('/');
+}
+
+function termListDir(path) {
+  var normalized = path.replace(/\/+/g, '/');
+  if (normalized !== '/' && normalized.endsWith('/')) normalized = normalized.slice(0, -1);
+  var entries = termFS[normalized];
+  if (!entries) return null;
+  return entries.map(function(e) {
+    var fullPath = normalized === '/' ? '/' + e : normalized + '/' + e;
+    return { name: e, isDir: termFS[fullPath] !== undefined };
+  });
+}
+
+function termGetFileContent(path) {
+  var normalized = path.replace(/\/+/g, '/');
+  if (termFileContents[normalized]) return termFileContents[normalized];
+  return null;
+}
+
+function termMkdir(path) {
+  var normalized = path.replace(/\/+/g, '/');
+  if (!termFS[normalized]) {
+    var parent = normalized.substring(0, normalized.lastIndexOf('/'));
+    if (parent === '') parent = '/';
+    if (termFS[parent]) {
+      termFS[parent].push(normalized.split('/').pop());
+      termFS[normalized] = [];
+      return true;
+    }
+  }
+  return false;
+}
+
+function termParse(cmd) {
+  var parts = cmd.trim().split(/\s+/);
+  var c = parts[0].toLowerCase();
+  var args = parts.slice(1);
+  var flags = args.filter(function(a) { return a.startsWith('-'); });
+  var nonFlags = args.filter(function(a) { return !a.startsWith('-'); });
+
+  if (c === 'clear' || c === 'cls') return { type: 'clear' };
+  if (c === 'pwd') return { type: 'output', text: termCwd };
+  if (c === 'whoami') return { type: 'output', text: 'user' };
+  if (c === 'uname') {
+    var a = args[0];
+    if (a === '-a') return { type: 'output', text: 'Darwin user-macbook 23.0.0 Darwin Kernel Version 23.0.0 arm64' };
+    if (a === '-r') return { type: 'output', text: '23.0.0' };
+    return { type: 'output', text: 'Darwin' };
+  }
+  if (c === 'echo') return { type: 'output', text: args.join(' ') };
+  if (c === 'date') {
+    var now = new Date();
+    return { type: 'output', text: now.toString() };
+  }
+
+  if (c === 'ls') {
+    var showHidden = flags.indexOf('-a') !== -1 || flags.indexOf('-l') !== -1;
+    var longFormat = flags.indexOf('-l') !== -1;
+    var target = nonFlags[0] || termCwd;
+    var resolved = termPathJoin(termCwd, target);
+    var entries = termListDir(resolved);
+    if (!entries) return { type: 'error', text: 'ls: cannot access \'' + target + '\': No such file or directory' };
+    var filtered = showHidden ? entries : entries.filter(function(e) { return !e.name.startsWith('.'); });
+    if (longFormat) {
+      var lines = ['total ' + filtered.length];
+      filtered.forEach(function(e) {
+        var perms = e.isDir ? 'drwxr-xr-x' : '-rw-r--r--';
+        lines.push(perms + '  1 user  staff  ' + (e.isDir ? '128' : '1024') + ' Jul  5 10:00 ' + e.name + (e.isDir ? '/' : ''));
+      });
+      return { type: 'output', text: lines.join('\n') };
+    }
+    return { type: 'output', text: filtered.map(function(e) { return e.name + (e.isDir ? '/' : ''); }).join('  ') };
+  }
+
+  if (c === 'cd') {
+    var target = nonFlags[0] || '/home/user';
+    var resolved = termPathJoin(termCwd, target);
+    var entries = termListDir(resolved);
+    if (!entries) return { type: 'error', text: 'cd: no such file or directory: ' + target };
+    termCwd = resolved;
+    return null;
+  }
+
+  if (c === 'cat') {
+    var target = nonFlags[0];
+    if (!target) return { type: 'error', text: 'cat: missing operand' };
+    var resolved = termPathJoin(termCwd, target);
+    var content = termGetFileContent(resolved);
+    if (content === null) return { type: 'error', text: 'cat: ' + target + ': No such file or directory' };
+    return { type: 'output', text: content };
+  }
+
+  if (c === 'mkdir') {
+    if (!nonFlags.length) return { type: 'error', text: 'mkdir: missing operand' };
+    var success = true;
+    nonFlags.forEach(function(d) {
+      var resolved = termPathJoin(termCwd, d);
+      if (!termMkdir(resolved)) success = false;
+    });
+    return success ? null : { type: 'error', text: 'mkdir: cannot create directory' };
+  }
+
+  if (c === 'rm') {
+    if (!nonFlags.length) return { type: 'error', text: 'rm: missing operand' };
+    return null;
+  }
+
+  if (c === 'cp' || c === 'mv') {
+    if (nonFlags.length < 2) return { type: 'error', text: c + ': missing file operand' };
+    return null;
+  }
+
+  if (c === 'python' || c === 'python3') {
+    if (!nonFlags.length) return { type: 'output', text: 'Python 3.13.1\nType "help()" for more information.\n\n>>> ' };
+    var script = nonFlags[0];
+    if (script === '-c') {
+      var code = args.slice(1).join(' ');
+      return { type: 'output', text: '[Python: ' + code + ']' };
+    }
+    if (script === '--version' || script === '-V') return { type: 'output', text: 'Python 3.13.1' };
+    var resolved = termPathJoin(termCwd, script);
+    var content = termGetFileContent(resolved);
+    if (!content) return { type: 'error', text: 'python: cannot open file \'' + script + '\': No such file or directory' };
+    if (script.endsWith('main.py') || resolved.endsWith('main.py')) {
+      var n = nonFlags[1] ? parseInt(nonFlags[1]) : 10;
+      var fibResult = (function fib(n) { return n <= 1 ? n : fib(n-1) + fib(n-2); })(n);
+      var factResult = (function fact(n) { return n <= 1 ? 1 : n * fact(n-1); })(n);
+      return { type: 'output', text: 'fib(' + n + ') = ' + fibResult + '\nfact(' + n + ') = ' + factResult };
+    }
+    return { type: 'output', text: '[Executing ' + script + '...]' };
+  }
+
+  if (c === 'pip') {
+    if (!nonFlags.length) return { type: 'output', text: 'pip 24.0 from /usr/local/lib/python3.13/site-packages (python 3.13)\n\nUsage:\n  pip <command> [options]\n\nCommands:\n  install    Install a package\n  list       List installed packages\n  show       Show package info\n  uninstall  Uninstall a package\n  freeze     Output installed packages\n' };
+    var subcmd = nonFlags[0];
+    if (subcmd === 'list') {
+      return { type: 'output', text: installedPkgs.join('\n') };
+    }
+    if (subcmd === 'show') {
+      var pkg = nonFlags[1];
+      if (!pkg) return { type: 'error', text: 'pip show: missing package name' };
+      if (installedPkgs.indexOf(pkg) === -1) return { type: 'error', text: 'WARNING: Package \'' + pkg + '\' is not installed' };
+      return { type: 'output', text: 'Name: ' + pkg + '\nVersion: 1.0.0\nSummary: A Python package\nHome-page: https://pypi.org/project/' + pkg + '\nAuthor: Developer\nLicense: MIT\n' };
+    }
+    if (subcmd === 'install') {
+      var pkgName = nonFlags[1];
+      if (!pkgName) return { type: 'error', text: 'pip install: missing package name' };
+      var cleanName = pkgName.replace(/[><=!~]/g, '');
+      if (installedPkgs.indexOf(cleanName) !== -1) return { type: 'output', text: 'Requirement already satisfied: ' + cleanName + ' (from versions: ' + installedPkgs.join(', ') + ')' };
+      installedPkgs.push(cleanName);
+      return { type: 'output', text: 'Collecting ' + pkgName + '\nDownloading ' + cleanName + '-1.0.0-py3-none-any.whl (10kB)\nInstalling collected packages: ' + cleanName + '\nSuccessfully installed ' + cleanName + '-1.0.0' };
+    }
+    if (subcmd === 'freeze') {
+      return { type: 'output', text: installedPkgs.map(function(p) { return p + '==1.0.0'; }).join('\n') };
+    }
+    if (subcmd === 'uninstall') {
+      var pkgName = nonFlags[1];
+      if (!pkgName) return { type: 'error', text: 'pip uninstall: missing package name' };
+      var idx = installedPkgs.indexOf(pkgName);
+      if (idx === -1) return { type: 'error', text: 'Cannot uninstall package \'' + pkgName + '\', not installed' };
+      installedPkgs.splice(idx, 1);
+      return { type: 'output', text: 'Found existing installation: ' + pkgName + ' 1.0.0\nUninstalling ' + pkgName + '-1.0.0:\n  Successfully uninstalled ' + pkgName + '-1.0.0' };
+    }
+    return { type: 'output', text: 'pip: unknown command \'' + subcmd + '\'' };
+  }
+
+  if (c === 'git') {
+    var subcmd = nonFlags[0];
+    if (!subcmd) return { type: 'output', text: 'usage: git <command> [<args>]\n\nCommands:\n  status    Show the working tree status\n  init      Create an empty Git repository\n  clone     Clone a repository\n  add       Add file contents to the index\n  commit    Record changes to the repository\n  push      Update remote refs\n  pull      Fetch from and integrate with another repository\n  log       Show commit logs\n  branch    List, create, or delete branches' };
+    if (subcmd === 'status') {
+      var lines = ['On branch main', ''];
+      if (gitFiles.staged.length) lines.push('Changes to be committed:', '  (use "git restore --staged <file>..." to unstage)');
+      gitFiles.staged.forEach(function(f) { lines.push('  modified:   ' + f); });
+      if (gitFiles.modified.length) lines.push('Changes not staged for commit:', '  (use "git add <file>..." to stage)');
+      gitFiles.modified.forEach(function(f) { lines.push('  modified:   ' + f); });
+      if (gitFiles.untracked.length) lines.push('Untracked files:', '  (use "git add <file>..." to include in what will be committed)');
+      gitFiles.untracked.forEach(function(f) { lines.push('  ' + f); });
+      lines.push('');
+      lines.push('no changes added to commit');
+      return { type: 'output', text: lines.join('\n') };
+    }
+    if (subcmd === 'log') {
+      return { type: 'output', text: 'commit a3f8d21 (HEAD -> main)\nAuthor: Developer <dev@example.com>\nDate:   Sun Jul 5 10:00:00 2026\n\n    Add new feature: terminal improvements\n\ncommit b2e4c90\nAuthor: Developer <dev@example.com>\nDate:   Sat Jul 4 15:30:00 2026\n\n    Fix: resolve import error in utils.py\n\ncommit c1d3b57\nAuthor: Developer <dev@example.com>\nDate:   Fri Jul 3 09:00:00 2026\n\n    Initial commit' };
+    }
+    if (subcmd === 'branch') return { type: 'output', text: '* main\n  develop\n  feature/new-ui' };
+    if (subcmd === 'clone') {
+      var repo = nonFlags[1] || 'https://github.com/example/repo.git';
+      return { type: 'output', text: 'Cloning into \'' + repo.split('/').pop().replace('.git', '') + '\'...\nReceiving objects: 100% (100/100), done.' };
+    }
+    if (subcmd === 'add') {
+      var file = nonFlags[1];
+      if (!file) return { type: 'error', text: 'Nothing specified, nothing added.\nmaybe you wanted: git add .' };
+      if (file === '.') {
+        gitFiles.modified.forEach(function(f) { if (gitFiles.modified.indexOf(f) !== -1) { gitFiles.staged.push(f); } });
+        gitFiles.untracked.forEach(function(f) { gitFiles.staged.push(f); });
+        gitFiles.modified = [];
+        gitFiles.untracked = [];
+      }
+      return { type: 'output', text: '' };
+    }
+    if (subcmd === 'commit') {
+      var msg = args.slice(2).join(' ') || 'Update';
+      return { type: 'output', text: '[main a4b5c6d] ' + msg + '\n 1 file changed, 3 insertions(+)' };
+    }
+    if (subcmd === 'push') return { type: 'output', text: 'Everything up-to-date' };
+    if (subcmd === 'pull') return { type: 'output', text: 'Already up to date.' };
+    if (subcmd === 'init') return { type: 'output', text: 'Initialized empty Git repository in /home/user/project/.git/' };
+    return { type: 'output', text: 'git: \'' + subcmd + '\' is not a git command.' };
+  }
+
+  if (c === 'npm') {
+    var subcmd = nonFlags[0];
+    if (!subcmd) return { type: 'output', text: 'npm <command>\n\nCommands:\n  install     Install a package\n  start       Start the application\n  test        Run tests\n  run         Run a script\n  list        List installed packages\n  init        Create a package.json' };
+    if (subcmd === 'list') {
+      var lines = ['/home/user/project'];
+      Object.keys(npmDeps).forEach(function(p) { lines.push('├── ' + p + '@' + npmDeps[p]); });
+      return { type: 'output', text: lines.join('\n') };
+    }
+    if (subcmd === 'install') {
+      var pkg = nonFlags[1];
+      if (!pkg) {
+        return { type: 'output', text: 'up to date, no packages added, 1 package already in node_modules' };
+      }
+      npmDeps[pkg.replace(/[@^~].*/, '')] = '^1.0.0';
+      return { type: 'output', text: '+ ' + pkg + '@1.0.0\nadded 1 package in 0.5s' };
+    }
+    if (subcmd === 'start') return { type: 'output', text: '\n> project@1.0.0 start\n> node server.js\n\nServer running at http://localhost:3000' };
+    if (subcmd === 'test') return { type: 'output', text: '\n> project@1.0.0 test\n> jest\n\nPASS  tests/test_main.py\nTests: 3 passed, 3 total' };
+    if (subcmd === 'run') {
+      var script = nonFlags[1];
+      if (!script) return { type: 'error', text: 'npm run: missing script name' };
+      if (script === 'dev') return { type: 'output', text: '\n> project@1.0.0 dev\n> nodemon server.js\n[nodemon] starting `node server.js`' };
+      return { type: 'output', text: '\n> project@1.0.0 ' + script + '\n> echo "Script output"' };
+    }
+    return { type: 'output', text: 'npm: unknown command \'' + (subcmd || '') + '\'' };
+  }
+
+  if (c === 'curl' || c === 'wget') {
+    var url = nonFlags[0] || '';
+    if (!url) return { type: 'error', text: c + ': missing URL' };
+    return { type: 'output', text: '<!DOCTYPE html><html><head><title>Response</title></head><body><h1>200 OK</h1></body></html>' };
+  }
+
+  if (c === 'ps') {
+    return { type: 'output', text: '  PID TTY          TIME CMD\n 1234 pts/0    00:00:00 bash\n 5678 pts/0    00:00:00 node\n 9012 pts/0    00:00:00 python\n 3456 pts/0    00:00:00 ps' };
+  }
+
+  if (c === 'top') {
+    return { type: 'output', text: 'Tasks: 3 total, 1 running, 2 sleeping\nCpu(s): 12.5%us, 3.2%sy, 0.0%ni, 84.1%id\nMem:  8.0G total, 3.2G used, 4.8G free\nSwap: 2.0G total, 0B used, 2.0G free' };
+  }
+
+  if (c === 'df') {
+    return { type: 'output', text: 'Filesystem      Size  Used Avail Use% Mounted on\n/dev/disk1s1     200G   80G  120G  40% /\n/dev/disk1s4     500G  200G  300G  40% /home/user\ntmpfs            2.0G  1.0M  2.0G   1% /dev/shm' };
+  }
+
+  if (c === 'history') {
+    return { type: 'output', text: termHistory.map(function(h, i) { return '  ' + (i + 1) + '  ' + h; }).join('\n') };
+  }
+
+  if (c === 'help' || c === '?') {
+    return { type: 'output', text: 'Available commands:\n  python, pip, npm, git\n  ls, cd, pwd, cat, mkdir, rm, cp, mv\n  echo, grep, awk, sed\n  curl, wget, ping\n  ps, top, df, free, kill\n  clear, history, uname, whoami, date, uptime' };
+  }
+
+  if (c === 'uptime') {
+    var now = new Date();
+    return { type: 'output', text: ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0') + ' up 3 days, 1 user, load average: 0.12, 0.08, 0.05' };
+  }
+
+  if (c === 'which' || c === 'whereis') {
+    var bin = nonFlags[0];
+    if (!bin) return { type: 'error', text: c + ': missing operand' };
+    return { type: 'output', text: '/usr/bin/' + bin };
+  }
+
+  var builtins = ['cd', 'pwd', 'echo', 'exit', 'logout', 'export', 'source', 'alias', 'unalias', 'type', 'hash', 'true', 'false', 'test'];
+  if (builtins.indexOf(c) !== -1) return null;
+
+  return { type: 'error', text: c + ': command not found' };
+}
+
+function termKeydown(e) {
+  var input = document.getElementById('term-input');
+  if (!input) return;
+  if (e.key === 'Enter') {
+    var cmd = input.value;
+    if (cmd.trim()) {
+      termHistory.push(cmd.trim());
+      termHistIdx = termHistory.length;
+    }
+    var body = document.getElementById('term-body');
+    var prompt = '<span style="color:var(--accent);">user@pythonide</span>:<span style="color:var(--fn);">' + termCwd.replace('/home/user/', '~') + '</span>$ ';
+    var cmdLine = document.createElement('div');
+    cmdLine.innerHTML = prompt + '<span class="term-out">' + escHtml(cmd) + '</span>';
+    body.appendChild(cmdLine);
+    input.value = '';
+    var result = termParse(cmd);
+    if (result) {
+      if (result.type === 'clear') {
+        body.innerHTML = '';
+      } else {
+        var resDiv = document.createElement('div');
+        if (result.type === 'error') resDiv.innerHTML = '<span class="term-err">' + escHtml(result.text) + '</span>';
+        else resDiv.innerHTML = '<span class="term-out" style="white-space:pre-wrap;">' + escHtml(result.text) + '</span>';
+        body.appendChild(resDiv);
+      }
+    }
+    body.scrollTop = body.scrollHeight;
+  } else if (e.key === 'ArrowUp') {
+    if (termHistIdx > 0) {
+      termHistIdx--;
+      input.value = termHistory[termHistIdx];
+    }
+    e.preventDefault();
+  } else if (e.key === 'ArrowDown') {
+    if (termHistIdx < termHistory.length - 1) {
+      termHistIdx++;
+      input.value = termHistory[termHistIdx];
+    } else {
+      termHistIdx = termHistory.length;
+      input.value = '';
+    }
+    e.preventDefault();
+  }
+}
+
+function termInsert(text) {
+  var input = document.getElementById('term-input');
+  if (!input) return;
+  input.value = text; input.focus();
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ===== Subscription System ===== */
+var SUB_STATE_KEY = 'pythonide:sub';
+var AI_COUNT_KEY = 'pythonide:ai_count';
+var MAX_FREE = 10;
+
+function getSubState() {
+  try {
+    var raw = localStorage.getItem(SUB_STATE_KEY);
+    return raw === 'true';
+  } catch (_) { return false; }
+}
+
+function setSubState(val) {
+  try { localStorage.setItem(SUB_STATE_KEY, val ? 'true' : 'false'); } catch (_) {}
+}
+
+function getAICount() {
+  try {
+    return parseInt(localStorage.getItem(AI_COUNT_KEY) || '0', 10);
+  } catch (_) { return 0; }
+}
+
+function setAICount(n) {
+  try { localStorage.setItem(AI_COUNT_KEY, String(n)); } catch (_) {}
+}
+
+function remainingFree() {
+  return Math.max(0, MAX_FREE - getAICount());
+}
+
+function isSubscribed() {
+  return getSubState();
+}
+
+function canUseAI() {
+  return isSubscribed() || remainingFree() > 0;
+}
+
+function updateAIBadge() {
+  var badge = document.getElementById('ai-free-badge');
+  if (!badge) return;
+  if (isSubscribed()) {
+    badge.textContent = '∞ 已订阅';
+    badge.className = 'ai-free-badge ok';
+    badge.onclick = null;
+  } else {
+    var rem = remainingFree();
+    badge.textContent = '剩余 ' + rem + ' 次';
+    badge.className = 'ai-free-badge ' + (rem <= 3 ? 'low' : 'ok');
+    if (rem <= 0) {
+      badge.textContent = '已用完 · 订阅';
+      badge.className = 'ai-free-badge done';
+      badge.onclick = function () { showPaywall(); };
+    }
+  }
+}
+
+function updateSubStatus() {
+  var el = document.getElementById('settings-sub-status');
+  if (el) el.textContent = isSubscribed() ? '✓ 已订阅' : '未订阅';
+}
+
+function showPaywall() {
+  var pw = document.getElementById('paywall');
+  if (pw) pw.classList.add('open');
+}
+
+function hidePaywall() {
+  var pw = document.getElementById('paywall');
+  if (pw) pw.classList.remove('open');
+}
+
+var selectedPlan = 'monthly';
+
+function selectPlan(plan) {
+  selectedPlan = plan;
+  document.querySelectorAll('.paywall-plan').forEach(function (p) { p.classList.remove('active'); });
+  var el = document.getElementById('plan-' + plan);
+  if (el) el.classList.add('active');
+}
+
+function subscribe() {
+  setSubState(true);
+  hidePaywall();
+  updateAIBadge();
+  updateSubStatus();
+  showToast('订阅成功！无限 AI 已解锁');
+  // Enable all AI controls
+  enableAIControls(true);
+}
+
+function subscribeFromScreen() {
+  setSubState(true);
+  updateAIBadge();
+  updateSubStatus();
+  showToast('订阅成功！无限 AI 已解锁');
+  enableAIControls(true);
+  switchTab('ai');
+}
+
+function selectSubPlan(plan) {
+  selectedPlan = plan;
+  document.querySelectorAll('.sub-plan-btn').forEach(function (p) { p.classList.remove('active'); });
+  document.getElementById('splan-' + plan).classList.add('active');
+  var price = document.getElementById('sub-price');
+  if (plan === 'monthly') price.innerHTML = '¥25<span>/月</span>';
+  else price.innerHTML = '¥198<span>/年</span>';
+}
+
+function enableAIControls(enabled) {
+  var input = document.getElementById('ai-input');
+  var send = document.querySelector('.ai-send');
+  var actions = document.querySelectorAll('.ai-action');
+  if (input) input.disabled = !enabled;
+  if (send) send.disabled = !enabled;
+  actions.forEach(function (a) { a.style.opacity = enabled ? '1' : '0.4'; });
+}
+
+/* ===== AI Chat with free usage tracking ===== */
+var aiCount = 0;
+
+function aiSend() {
+  if (!canUseAI()) {
+    showPaywall();
+    return;
+  }
+  var input = document.getElementById('ai-input');
+  var msg = input.value.trim();
+  if (!msg) return;
+  var container = document.getElementById('ai-msgs');
+  var userMsg = document.createElement('div');
+  userMsg.className = 'ai-msg user fade-up';
+  userMsg.textContent = msg;
+  container.appendChild(userMsg); input.value = '';
+  container.scrollTop = container.scrollHeight;
+  aiCount++;
+
+  if (!isSubscribed()) {
+    var count = getAICount() + 1;
+    setAICount(count);
+    updateAIBadge();
+  }
+
+  setTimeout(function () {
+    var replies = [
+      '这个递归实现的 fibonacci 是 O(2ⁿ) 复杂度。可以用 `@lru_cache` 装饰器将结果缓存，将复杂度降到 O(n)：\n\n```python\nfrom functools import lru_cache\n\n@lru_cache(maxsize=None)\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)\n```\n\n这样 fib(35) 可以在毫秒级完成，而不是几十秒。',
+      '这段代码的 DataProcessor 类设计良好。建议在 stats() 方法中加入 try/except 处理空数组的情况，避免 np.array([]).mean() 抛出警告。',
+      '没发现明显 Bug。唯一建议：fibonacci 的递归深度限制在 n>1000 时会触发 RecursionError，可用 `sys.setrecursionlimit(10000)` 或改用循环版本。',
+      '代码注释建议如下：\n\n```python\ndef fibonacci(n):\n    """计算斐波那契数列第 n 项（递归）\n    \n    Args:\n        n: 非负整数\n    Returns:\n        int: 斐波那契数列第 n 项\n    \"\"\"\n    if n <= 1:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)\n```',
+      '建议添加 pytest 测试：\n\n```python\nimport pytest\nfrom fibonacci import fibonacci, DataProcessor\n\ndef test_fibonacci():\n    assert fibonacci(0) == 0\n    assert fibonacci(1) == 1\n    assert fibonacci(10) == 55\n    \ndef test_dataprocessor():\n    dp = DataProcessor([1, 2, 3])\n    assert dp.stats()["mean"] == 2.0\n```',
+      '重构建议：将递归改为迭代更符合 Python 风格：\n\n```python\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    a, b = 0, 1\n    for _ in range(n-1):\n        a, b = b, a + b\n    return b\n```\n\n时间复杂度 O(n)，空间 O(1)，无递归深度问题。',
+    ];
+    var reply = replies[aiCount % replies.length];
+    var aiMsg = document.createElement('div');
+    aiMsg.className = 'ai-msg assistant fade-up';
+    var processed = reply.replace(/```(\w+)?\n([\s\S]*?)```/g, '<div class="code-b"><button class="code-copy" onclick="copyCode(this)">复制</button>$2</div>');
+    processed = processed.replace(/\n/g, '<br>');
+    aiMsg.innerHTML = processed;
+    container.appendChild(aiMsg);
+    container.scrollTop = container.scrollHeight;
+  }, 900);
+}
+
+function aiKeydown(e) { if (e.key === 'Enter') aiSend(); }
+
+function aiQuickAction(el) {
+  var action = el.textContent;
+  var currentFile = document.querySelector('#s-editor .nav-title') ? document.querySelector('#s-editor .nav-title').textContent : 'main.py';
+  var msgs = {
+    '解释代码': '请解释一下 ' + currentFile + ' 中 fibonacci 函数的原理',
+    '优化性能': '如何优化 ' + currentFile + ' 中的 fibonacci 函数性能',
+    '查找 Bug': '帮我检查 ' + currentFile + ' 中是否有潜在 Bug',
+    '添加注释': '为 ' + currentFile + ' 添加详细的代码注释',
+    '写测试': '为 ' + currentFile + ' 编写单元测试',
+    '重构': '如何重构 ' + currentFile + ' 使其更 Pythonic',
+  };
+  document.getElementById('ai-input').value = msgs[action] || action;
+  aiSend();
+}
+
+function copyCode(btn) {
+  var code = btn.parentElement.textContent.replace('复制','').trim();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(function () {
+      btn.textContent = '已复制';
+      setTimeout(function () { btn.textContent = '复制'; }, 1500);
+    });
+  } else {
+    btn.textContent = '已复制';
+    setTimeout(function () { btn.textContent = '复制'; }, 1500);
+  }
+}
+
+/* ===== Theme/Skin System =====
+   两层架构：data-mode (light/dark) × data-theme (emerald/ocean/...)
+   模式与色板独立持久化，互不影响 */
+var THEME_KEY = 'pythonide:theme';
+var MODE_KEY = 'pythonide:mode';
+
+function getSavedTheme() {
+  try { return localStorage.getItem(THEME_KEY) || 'emerald'; } catch (_) { return 'emerald'; }
+}
+function getSavedMode() {
+  try {
+    var m = localStorage.getItem(MODE_KEY);
+    return (m === 'light' || m === 'dark') ? m : 'light';
+  } catch (_) { return 'light'; }
+}
+
+var THEME_NAMES = {
+  emerald: '翠绿', ocean: '海洋蓝', lilac: '丁香紫',
+  sunset: '日落橙', rose: '玫瑰粉', teal: '碧波青', graphite: '石墨灰'
+};
+var MODE_NAMES = { light: '浅色', dark: '深色' };
+
+function applyMode(id, silent) {
+  document.getElementById('app').setAttribute('data-mode', id);
+  try { localStorage.setItem(MODE_KEY, id); } catch (_) {}
+  // 同步 Segmented Control 高亮
+  document.querySelectorAll('#mode-seg .mode-seg-btn').forEach(function (b) {
+    b.classList.toggle('active', b.getAttribute('data-mode-value') === id);
+  });
+  if (!silent) showToast('已切换到' + MODE_NAMES[id] + '模式');
+}
+
+function setMode(id) {
+  if (id !== 'light' && id !== 'dark') return;
+  applyMode(id, false);
+}
+
+function setTheme(id, silent) {
+  document.getElementById('app').setAttribute('data-theme', id);
+  try { localStorage.setItem(THEME_KEY, id); } catch (_) {}
+  document.querySelectorAll('#theme-list .theme-swatch').forEach(function (s) { s.classList.remove('active'); });
+  document.querySelectorAll('#theme-list .theme-row').forEach(function (r) {
+    if (r.getAttribute('data-theme-value') === id) {
+      r.querySelector('.theme-swatch').classList.add('active');
+    }
+  });
+  if (!silent) showToast('色板: ' + (THEME_NAMES[id] || id));
+}
+
+function showSubScreen() {
+  switchTab('subscription');
+}
+
+/* ===== Init ===== */
+(function init() {
+  // Restore mode + theme (silent)
+  applyMode(getSavedMode(), true);
+  setTheme(getSavedTheme(), true);
+
+  // Render file list from FS model
+  renderFiles();
+
+  // Update subscription / AI state
+  updateSubStatus();
+  updateAIBadge();
+  if (!isSubscribed() && remainingFree() <= 0) {
+    enableAIControls(false);
+  } else {
+    enableAIControls(true);
+  }
+
+  // Show editor screen by default
+  switchTab('editor');
+})();
+
+/* ===== SSH Terminal ===== */
+var sshServers = [
+  {name: '生产服务器', host: '1.2.3.4', port: 22, user: 'root', status: 'disconnected'},
+  {name: '测试服务器', host: '5.6.7.8', port: 22, user: 'ubuntu', status: 'disconnected'},
+  {name: '树莓派', host: '192.168.1.100', port: 22, user: 'pi', status: 'disconnected'}
+];
+var sshConnected = null;
+var sshHistory = [];
+var sshHistIdx = -1;
+
+function sshRenderServers() {
+  var list = document.getElementById('ssh-server-list');
+  if (!list) return;
+  var html = '<div class="settings-sec"><div class="settings-sec-title">服务器</div><div class="settings-group">';
+  sshServers.forEach(function(s, i) {
+    var connected = sshConnected && sshConnected.host === s.host;
+    html += '<div class="settings-item" onclick="sshConnect(' + i + ')" style="' + (connected ? 'background:var(--accent-dim);' : '') + '">\
+      <div class="settings-sicon" style="background:var(--accent-dim);color:var(--accent);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg></div>\
+      <span class="settings-label">' + s.name + '</span>\
+      <span class="settings-val">' + s.user + '@' + s.host + ':' + s.port + '</span>\
+      <span class="settings-arrow">' + (connected ? '已连接' : '›') + '</span>\
+    </div>';
+  });
+  html += '</div></div>';
+  list.innerHTML = html;
+}
+
+function sshConnect(idx) {
+  sshConnected = sshServers[idx];
+  sshHistory = [];
+  sshHistIdx = -1;
+  document.getElementById('ssh-server-list').style.display = 'none';
+  document.getElementById('ssh-connected-view').style.display = 'block';
+  document.getElementById('ssh-current-server').textContent = sshConnected.user + '@' + sshConnected.host;
+  var out = document.getElementById('ssh-output');
+  out.textContent = 'Connecting to ' + sshConnected.host + '...\n';
+  setTimeout(function() {
+    out.textContent += 'Connected to ' + sshConnected.name + ' (' + sshConnected.host + ')\n';
+    out.textContent += sshConnected.user + '@' + sshConnected.host + ':~$ ';
+  }, 600);
+}
+
+function sshDisconnect() {
+  if (!sshConnected) return;
+  var out = document.getElementById('ssh-output');
+  out.textContent += '\nConnection to ' + sshConnected.host + ' closed.\n';
+  setTimeout(function() {
+    sshConnected = null;
+    document.getElementById('ssh-connected-view').style.display = 'none';
+    document.getElementById('ssh-server-list').style.display = 'block';
+    sshRenderServers();
+  }, 800);
+}
+
+function sshRunCmd() {
+  var inp = document.getElementById('ssh-input');
+  var cmd = inp.value.trim();
+  if (!cmd || !sshConnected) return;
+  inp.value = '';
+  var out = document.getElementById('ssh-output');
+  var prompt = sshConnected.user + '@' + sshConnected.host + ':~$ ';
+  sshHistory.push(cmd);
+  sshHistIdx = sshHistory.length;
+  out.textContent += prompt + cmd + '\n';
+  var resp = sshParseCmd(cmd, sshConnected);
+  out.textContent += resp;
+  out.textContent += '\n' + prompt;
+  out.scrollTop = out.scrollHeight;
+}
+
+function sshParseCmd(cmd, srv) {
+  var c = cmd.toLowerCase().trim();
+  if (c === 'clear' || c === 'cls') return '';
+  if (c === 'pwd') return '/home/' + srv.user;
+  if (c === 'whoami') return srv.user;
+  if (c === 'uname -a') return 'Linux ' + srv.host + ' 6.1.0-arm64 #1 SMP Debian 6.1.0 arm64 GNU/Linux';
+  if (c === 'uname') return 'Linux';
+  if (c === 'hostname') return srv.host;
+  if (c === 'uptime') return ' ' + Math.floor(Math.random()*24+1) + ':' + Math.floor(Math.random()*60) + ' up 12 days, 3 users, load average: 0.12, 0.08, 0.05';
+  if (c === 'ls') return 'Desktop  Documents  Downloads  projects  script.sh  requirements.txt';
+  if (c === 'ls -la' || c === 'ls -l') return 'total 32\ndrwxr-xr-x  3 ' + srv.user + '  4096 Jul  5 10:00 .\ndrwxr-xr-x  2 ' + srv.user + '  4096 Jul  5 09:00 Desktop\ndrwxr-xr-x  2 ' + srv.user + '  4096 Jul  5 09:30 Documents\ndrwxr-xr-x  2 ' + srv.user + '  4096 Jul  5 09:30 Downloads\n-rw-r--r--  1 ' + srv.user + '   220 Jul  5 09:00 .bashrc\n-rw-r--r--  1 ' + srv.user + '  4096 Jul  5 09:00 requirements.txt';
+  if (c === 'cd Desktop'.toLowerCase() || c === 'cd desktop') return '';
+  if (c === 'cd Documents'.toLowerCase() || c === 'cd documents') return '';
+  if (c === 'cd ..' || c === 'cd..') return '';
+  if (c.indexOf('cd ') === 0) return '';
+  if (c === 'cat requirements.txt') return 'flask==3.0.0\nrequests==2.31.0\nnumpy==1.26.0';
+  if (c === 'cat .bashrc') return '# ~/.bashrc: executed by bash for non-login shells.\n# If not running interactively, return\nexit';
+  if (c === 'ps') return '  PID TTY          TIME CMD\n    1 ?        00:00:02 systemd\n 1234 pts/0    00:00:00 bash\n 5678 pts/0    00:00:00 python\n 9012 pts/0    00:00:00 ssh';
+  if (c === 'ps aux') return 'USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\nroot         1  0.0  0.1   1234  5678 ?        Ss    09:00   0:02 /sbin/init\n' + srv.user + '    1234  0.1  0.2  45678 23456 pts/0    Ss    09:30   0:00 bash\n' + srv.user + '    5678  0.5  1.1  78901 45678 pts/0    Sl    09:45   0:12 python app.py';
+  if (c === 'df -h') return 'Filesystem      Size  Used Avail Use% Mounted on\n/dev/root       20G   8G   12G  40% /\ntmpfs           200M     0  200M   0% /dev/shm\n/dev/sda1       50G   20G   30G  35% /home';
+  if (c === 'free -h') return '               total        used        free      shared  buff/cache   available\nMem:           1.9Gi       456Mi       1.1Gi        12Mi       380Mi       1.3Gi\nSwap:          511Mi          0B       511Mi';
+  if (c === 'ifconfig' || c === 'ip addr') return srv.host + '  inet ' + srv.host + '/24  broadcast 255.255.255.0\n        inet6 xxxx::xxxx:xxxx:xxxx  prefixlen 64  scopeid 0x20<link>\n        ether xx:xx:xx:xx:xx:xx  txqueuelen 1000  (Ethernet)';
+  if (c.indexOf('python') === 0 || c.indexOf('python3') === 0) {
+    var code = cmd.substring(cmd.indexOf(' ')).trim();
+    if (!code) return 'Python 3.11.4\nType "help()" for more information.';
+    return '  File "<stdin>", line 1\n    SyntaxError: invalid syntax';
+  }
+  if (c === 'exit' || c === 'logout') { sshDisconnect(); return '[closed]'; }
+  if (c === 'help') return 'Available commands: ls, cd, pwd, cat, python, pip, git, npm, clear, exit, uptime, df, free, ps, ifconfig, hostname, whoami, uname';
+  return 'bash: ' + cmd.split(' ')[0] + ': command not found';
+}
+
+function sshAddServer() {
+  var name = prompt('服务器名称:');
+  if (!name) return;
+  var host = prompt('主机地址:');
+  if (!host) return;
+  var user = prompt('用户名:', 'root');
+  if (!user) return;
+  var port = prompt('端口:', '22');
+  sshServers.push({name: name, host: host, port: parseInt(port)||22, user: user, status: 'disconnected'});
+  sshRenderServers();
+  showToast('已添加服务器: ' + name);
+}
+
+/* ===== Notebook ===== */
+var nbCells = [];
+var nbCounter = 0;
+
+function nbInit() {
+  nbCells = [];
+  nbCounter = 0;
+  nbAddCell('code', '# 欢迎使用 Python Notebook\n# 点击运行按钮执行代码\na = 10\nb = 20\nprint(a + b)');
+  nbAddCell('code', 'import datetime\nnow = datetime.datetime.now()\nprint("当前时间:", now.strftime("%Y-%m-%d %H:%M:%S"))');
+  nbAddCell('markdown', '# Markdown 单元格\n这是支持**粗体**和*斜体*的笔记。\n- 项目 1\n- 项目 2');
+  nbRender();
+}
+
+function nbAddCell(type, content) {
+  nbCounter++;
+  nbCells.push({id: nbCounter, type: type || 'code', content: content || '', output: ''});
+  if (document.getElementById('s-notebook')) nbRender();
+}
+
+function nbRender() {
+  var container = document.getElementById('nb-cells');
+  if (!container) return;
+  var html = '';
+  nbCells.forEach(function(cell, idx) {
+    if (cell.type === 'markdown') {
+      html += '<div class="nb-cell" style="margin-bottom:12px;">\
+        <div class="nb-toolbar" style="display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">\
+          <span style="font-size:11px;color:var(--muted);">MD</span>\
+          <button onclick="nbDeleteCell(' + idx + ')" style="margin-left:auto;background:none;border:none;color:var(--danger);cursor:pointer;font-size:12px;padding:2px 6px;">删除</button>\
+        </div>\
+        <textarea class="nb-md-editor" data-idx="' + idx + '" style="width:100%;min-height:60px;padding:10px;background:var(--code-bg);border:1px solid var(--border);border-radius:0 0 12px 12px;color:var(--fg);font-size:13px;font-family:var(--font-mono);outline:none;resize:vertical;box-sizing:border-box;border-top:none;" placeholder="Markdown 内容..." oninput="nbUpdateCell(' + idx + ', this.value)">' + escHtml(cell.content) + '</textarea>\
+        <div class="nb-md-preview" style="display:none;padding:10px;color:var(--fg);font-size:14px;line-height:1.6;">' + nbMdRender(cell.content) + '</div>\
+      </div>';
+    } else {
+      html += '<div class="nb-cell" style="margin-bottom:12px;">\
+        <div class="nb-toolbar" style="display:flex;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">\
+          <span style="font-size:11px;color:var(--muted);">In [' + (idx + 1) + ']</span>\
+          <button onclick="nbRunCell(' + idx + ')" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:12px;cursor:pointer;">运行</button>\
+          <button onclick="nbDeleteCell(' + idx + ')" style="margin-left:auto;background:none;border:none;color:var(--danger);cursor:pointer;font-size:12px;padding:2px 6px;">删除</button>\
+        </div>\
+        <textarea class="nb-code-editor" data-idx="' + idx + '" style="width:100%;min-height:80px;padding:10px;background:var(--code-bg);border:1px solid var(--border);border-radius:0 0 12px 12px;color:var(--fg);font-size:13px;font-family:var(--font-mono);outline:none;resize:vertical;box-sizing:border-box;border-top:none;" placeholder="Python 代码..." oninput="nbUpdateCell(' + idx + ', this.value)">' + escHtml(cell.content) + '</textarea>';
+      if (cell.output) {
+        html += '<div class="nb-output" style="padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;font-family:var(--font-mono);font-size:12px;color:var(--fg);white-space:pre-wrap;max-height:150px;overflow-y:auto;">' + escHtml(cell.output) + '</div>';
+      }
+      html += '</div>';
+    }
+  });
+  html += '<button onclick="nbAddCell(\'code\')" style="width:100%;padding:10px;background:var(--surface2);border:1px dashed var(--border);border-radius:12px;color:var(--muted);font-size:14px;cursor:pointer;">+ 添加代码单元格</button>';
+  container.innerHTML = html;
+}
+
+function nbUpdateCell(idx, val) {
+  if (nbCells[idx]) nbCells[idx].content = val;
+}
+
+function nbRunCell(idx) {
+  var cell = nbCells[idx];
+  if (!cell) return;
+  var code = cell.content;
+  var output = nbSimRun(code);
+  cell.output = output;
+  nbRender();
+}
+
+function nbSimRun(code) {
+  try {
+    var lines = code.split('\n');
+    var output = '';
+    var vars = {};
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line || line.startsWith('#')) continue;
+      if (line.startsWith('import ')) { output += '(imported: ' + line.substring(7).trim() + ')\n'; continue; }
+      if (line.startsWith('from ')) { output += '(module loaded)\n'; continue; }
+      if (line.startsWith('print(') && line.endsWith(')')) {
+        var inner = line.substring(6, line.length - 1);
+        if ((inner.startsWith('"') && inner.endsWith('"')) || (inner.startsWith("'") && inner.endsWith("'"))) {
+          output += inner.slice(1, -1) + '\n';
+        } else {
+          output += '[output]\n';
+        }
+        continue;
+      }
+      if (line.indexOf('=') !== -1 && !line.includes('==') && !line.includes('!=')) {
+        var parts = line.split('=');
+        var vname = parts[0].trim();
+        var val = parts.slice(1).join('=').trim();
+        if (/^-?\d+(\.\d+)?$/.test(val)) vars[vname] = parseFloat(val);
+        else vars[vname] = val;
+        output += '';
+        continue;
+      }
+      if (line.startsWith('for ') || line.startsWith('if ') || line.startsWith('while ')) {
+        output += '(control flow)\n';
+        continue;
+      }
+      if (line === 'pass') continue;
+      if (line === 'return' || line === 'break' || line === 'continue') continue;
+      output += '';
+    }
+    return output.trim() || '(no output)';
+  } catch(e) {
+    return 'Error: ' + e.message;
+  }
+}
+
+function nbMdRender(md) {
+  return md.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>').replace(/^# (.+)$/gm, '<h3 style="margin:0 0 4px;font-size:15px;">$1</h3>').replace(/^- (.+)$/gm, '<div style="margin:2px 0;">&bull; $1</div>').replace(/\n/g, '<br>');
+}
+
+function nbDeleteCell(idx) {
+  nbCells.splice(idx, 1);
+  nbRender();
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ===== Scene Canvas ===== */
+var sceneTool = 'rect';
+var sceneColor = '#34d399';
+
+function sceneSetTool(btn) {
+  document.querySelectorAll('.scene-tool').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  sceneTool = btn.getAttribute('data-tool');
+}
+
+function sceneClear() {
+  var c = document.getElementById('scene-canvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = getComputedStyle(document.getElementById('s-scene')).getPropertyValue('--surface2') || '#1a1a2e';
+  ctx.fillRect(0, 0, c.width, c.height);
+}
+
+function sceneRunScript() {
+  var c = document.getElementById('scene-canvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  sceneClear();
+  var script = document.getElementById('scene-script').value;
+  try {
+    var shapes = [];
+    var Rect = function(x, y, w, h, opts) {
+      opts = opts || {};
+      shapes.push({type:'rect', x:x, y:y, w:w, h:h, color:opts.color||'#34d399', radius:opts.radius||0, fill:opts.fill!==undefined?opts.fill:false});
+    };
+    var Circle = function(x, y, r, opts) {
+      opts = opts || {};
+      shapes.push({type:'circle', x:x, y:y, r:r, color:opts.color||'#f87171', fill:opts.fill!==undefined?opts.fill:true});
+    };
+    var Line = function(x1, y1, x2, y2, opts) {
+      opts = opts || {};
+      shapes.push({type:'line', x1:x1, y1:y1, x2:x2, y2:y2, color:opts.color||'#60a5fa', width:opts.width||2});
+    };
+    var Text = function(x, y, str, opts) {
+      opts = opts || {};
+      shapes.push({type:'text', x:x, y:y, text:str, color:opts.color||'#60a5fa', size:opts.size||16});
+    };
+    eval(script);
+    shapes.forEach(function(s) {
+      ctx.strokeStyle = s.color;
+      ctx.fillStyle = s.color;
+      ctx.lineWidth = s.width || 2;
+      if (s.type === 'rect') {
+        if (s.radius > 0) {
+          ctx.beginPath();
+          ctx.roundRect(s.x, s.y, s.w, s.h, s.radius);
+          if (s.fill) ctx.fill(); else ctx.stroke();
+        } else {
+          if (s.fill) { ctx.fillRect(s.x, s.y, s.w, s.h); } else { ctx.strokeRect(s.x, s.y, s.w, s.h); }
+        }
+      } else if (s.type === 'circle') {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        if (s.fill) ctx.fill(); else ctx.stroke();
+      } else if (s.type === 'line') {
+        ctx.beginPath();
+        ctx.moveTo(s.x1, s.y1);
+        ctx.lineTo(s.x2, s.y2);
+        ctx.stroke();
+      } else if (s.type === 'text') {
+        ctx.font = (s.size || 16) + 'px var(--font-body)';
+        ctx.fillText(s.text, s.x, s.y);
+      }
+    });
+    showToast('渲染完成，共 ' + shapes.length + ' 个图形');
+  } catch(e) {
+    showToast('脚本错误: ' + e.message);
+  }
+}
+
+/* ===== MiniApp ===== */
+var miniTemplate = 'counter';
+var miniCode = '';
+
+var miniTemplates = {
+  counter: `from miniapp import App, Button, Text
+
+class CounterApp(App):
+    def build(self):
+        count = 0
+        def on_click():
+            nonlocal count
+            count += 1
+            label.set_text("计数: " + str(count))
+        label = Text("计数: 0", size=24)
+        btn = Button("+1", on_click=on_click, color="#34d399")
+        return [label, btn]`,
+  todo: `from miniapp import App, Text, Input, Button, List
+
+class TodoApp(App):
+    def build(self):
+        items = []
+        def add_item():
+            text = input.get_text()
+            if text:
+                items.append(text)
+                listView.set_items(items)
+        input = Input(placeholder="待办事项...")
+        btn = Button("添加", on_click=add_item, color="#60a5fa")
+        listView = List(items=[])
+        return [Text("待办列表", size=20), input, btn, listView]`,
+  weather: `from miniapp import App, Text, Card
+
+class WeatherApp(App):
+    def build(self):
+        return [
+            Text("杭州天气", size=22),
+            Card(title="今天", content="26°C · 多云 · 空气质量良"),
+            Card(title="明天", content="28°C · 晴"),
+            Card(title="后天", content="25°C · 小雨"),
+        ]`
+};
+
+function miniSelectTemplate(el) {
+  document.querySelectorAll('.mini-template').forEach(function(t) {
+    t.style.borderColor = 'var(--border)';
+    t.style.borderWidth = '1px';
+  });
+  el.style.borderColor = 'var(--accent)';
+  el.style.borderWidth = '2px';
+  miniTemplate = el.getAttribute('data-template');
+  var code = miniTemplates[miniTemplate] || '';
+  var editor = document.getElementById('mini-editor');
+  if (editor) editor.value = code;
+  miniCode = code;
+  miniUpdatePreview();
+}
+
+function miniRun() {
+  var code = document.getElementById('mini-editor').value;
+  miniCode = code;
+  miniUpdatePreview();
+}
+
+function miniUpdatePreview() {
+  var preview = document.getElementById('mini-preview');
+  if (!preview) return;
+  var t = miniTemplate;
+  if (t === 'counter') {
+    preview.innerHTML = '<div style="text-align:center;padding:20px;"><div id="mp-count" style="font-size:48px;font-weight:700;color:var(--fg);margin-bottom:16px;">0</div><button id="mp-btn" onclick="mpIncrement()" style="padding:12px 32px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:18px;cursor:pointer;">+1</button></div>';
+  } else if (t === 'todo') {
+    preview.innerHTML = '<div style="padding:16px;"><div style="font-size:18px;font-weight:600;margin-bottom:12px;color:var(--fg);">待办列表</div><div id="mp-todo-list" style="margin-bottom:10px;"></div><div style="display:flex;gap:8px;"><input id="mp-todo-input" type="text" placeholder="添加待办..." style="flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-size:13px;outline:none;"><button onclick="mpAddTodo()" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;">添加</button></div></div>';
+  } else if (t === 'weather') {
+    preview.innerHTML = '<div style="padding:16px;"><div style="font-size:20px;font-weight:600;margin-bottom:12px;color:var(--fg);">杭州天气</div><div style="display:flex;flex-direction:column;gap:8px;"><div style="padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);"><div style="font-size:13px;color:var(--muted);margin-bottom:4px;">今天</div><div style="font-size:16px;color:var(--fg);">26°C · 多云</div></div><div style="padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);"><div style="font-size:13px;color:var(--muted);margin-bottom:4px;">明天</div><div style="font-size:16px;color:var(--fg);">28°C · 晴</div></div><div style="padding:12px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);"><div style="font-size:13px;color:var(--muted);margin-bottom:4px;">后天</div><div style="font-size:16px;color:var(--fg);">25°C · 小雨</div></div></div></div>';
+  }
+}
+
+var mpCount = 0;
+function mpIncrement() {
+  mpCount++;
+  var el = document.getElementById('mp-count');
+  if (el) el.textContent = mpCount;
+}
+
+function mpAddTodo() {
+  var inp = document.getElementById('mp-todo-input');
+  var val = inp.value.trim();
+  if (!val) return;
+  var list = document.getElementById('mp-todo-list');
+  var item = document.createElement('div');
+  item.style.cssText = 'padding:6px 0;border-bottom:1px solid var(--border);color:var(--fg);font-size:14px;';
+  item.textContent = val;
+  list.appendChild(item);
+  inp.value = '';
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'mp-btn') mpIncrement();
+  if (e.target && e.target.getAttribute('onclick') === 'mpAddTodo()') mpAddTodo();
+});
+
+/* ===== Tools ===== */
+function toolsFormatJson() {
+  var inp = document.getElementById('tools-json-in').value;
+  try {
+    var obj = JSON.parse(inp);
+    document.getElementById('tools-json-out').value = JSON.stringify(obj, null, 2);
+    showToast('JSON 格式化成功');
+  } catch(e) {
+    showToast('JSON 解析错误: ' + e.message);
+  }
+}
+
+function toolsMinifyJson() {
+  var inp = document.getElementById('tools-json-in').value;
+  try {
+    var obj = JSON.parse(inp);
+    document.getElementById('tools-json-out').value = JSON.stringify(obj);
+    showToast('JSON 压缩成功');
+  } catch(e) {
+    showToast('JSON 解析错误: ' + e.message);
+  }
+}
+
+function toolsGenQR() {
+  var text = document.getElementById('tools-qr-input').value;
+  if (!text) { showToast('请输入内容'); return; }
+  var canvas = document.getElementById('tools-qr-canvas');
+  var output = document.getElementById('tools-qr-output');
+  try {
+    QRCode.toCanvas(canvas, text, {width: 160, margin: 2}, function(error) {
+      if (error) {
+        toolsDrawQRFallback(canvas, text);
+      }
+      output.style.display = 'flex';
+      showToast('QR 码已生成');
+    });
+  } catch(e) {
+    toolsDrawQRFallback(canvas, text);
+    output.style.display = 'flex';
+  }
+}
+
+function toolsDrawQRFallback(canvas, text) {
+  var ctx = canvas.getContext('2d');
+  var size = 160;
+  var cell = 10;
+  var offset = (size - cell * 37) / 2;
+  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = '#000000';
+  var hash = 0;
+  for (var i = 0; i < text.length; i++) hash = ((hash << 5) - hash) + text.charCodeAt(i);
+  var cells = [];
+  for (var r = 0; r < 37; r++) {
+    cells[r] = [];
+    for (var c = 0; c < 37; c++) {
+      if (r < 7 || r > 29 || c < 7 || c > 29) {
+        if ((r < 9 && c < 9) || (r < 9 && c > 27) || (r > 27 && c < 9)) {
+          cells[r][c] = (r % 2 === 0) ? 1 : 0;
+        } else {
+          cells[r][c] = Math.abs(((hash * (r + 1) * (c + 1)) % 3));
+        }
+      } else {
+        cells[r][c] = Math.abs(((hash * (r + c) + i) % 5) % 2);
+      }
+    }
+  }
+  for (var r = 0; r < 37; r++) {
+    for (var c = 0; c < 37; c++) {
+      if (cells[r][c]) ctx.fillRect(offset + c * cell, offset + r * cell, cell, cell);
+    }
+  }
+}
+
+function toolsSaveQR() {
+  var canvas = document.getElementById('tools-qr-canvas');
+  var link = document.createElement('a');
+  link.download = 'qrcode.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('QR 码已保存');
+}
+
+function toolsEncode64() {
+  var inp = document.getElementById('tools-b64-in').value;
+  try {
+    document.getElementById('tools-b64-out').value = btoa(unescape(encodeURIComponent(inp)));
+    showToast('Base64 编码成功');
+  } catch(e) {
+    showToast('编码失败: ' + e.message);
+  }
+}
+
+function toolsDecode64() {
+  var inp = document.getElementById('tools-b64-in').value;
+  try {
+    document.getElementById('tools-b64-out').value = decodeURIComponent(escape(atob(inp)));
+    showToast('Base64 解码成功');
+  } catch(e) {
+    showToast('解码失败: 无效的 Base64 字符串');
+  }
+}
+
+/* QRCode library - minimal implementation */
+var QRCode = {
+  toCanvas: function(canvas, text, opts, cb) {
+    try {
+      var ctx = canvas.getContext('2d');
+      var size = opts.width || 160;
+      var cell = Math.floor(size / 37);
+      var offset = Math.floor((size - cell * 37) / 2);
+      ctx.clearRect(0, 0, size, size);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      ctx.fillStyle = '#000000';
+      var hash = 0;
+      for (var i = 0; i < text.length; i++) hash = ((hash << 5) - hash) + text.charCodeAt(i);
+      var hash2 = hash;
+      for (var r = 0; r < 37; r++) {
+        for (var c = 0; c < 37; c++) {
+          if ((r < 9 && c < 9) || (r < 9 && c > 27) || (r > 27 && c < 9)) {
+            if ((r === 0) || (c === 0) || (r === 8) || (c === 8) || (r === 7 && c === 7)) {
+              ctx.fillRect(offset + c * cell, offset + r * cell, cell, cell);
+            }
+          } else if (r < 9 || r > 27 || c < 9 || c > 27) {
+            if (Math.abs(hash2 * (r + c + 1) % 3) < 1) ctx.fillRect(offset + c * cell, offset + r * cell, cell, cell);
+          } else {
+            if (Math.abs((hash2 * r * c + r + c) % 2) < 1) ctx.fillRect(offset + c * cell, offset + r * cell, cell, cell);
+          }
+        }
+      }
+      cb(null);
+    } catch(e) { cb(e); }
+  }
+};
+</script>
+</body>
+</html>

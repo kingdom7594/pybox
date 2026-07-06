@@ -10,113 +10,136 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         html, body {
             height: 100%;
             width: 100%;
             overflow: hidden;
-            font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
-            background-color: #1E1E1E;
+            font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', 'Monaco', monospace;
+            background-color: #010202;
         }
-        
+
         #editor {
             height: 100%;
             width: 100%;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 13px;
+            line-height: 1.7;
         }
-        
+
         .cm-editor {
             height: 100%;
-            background-color: #1E1E1E;
+            background-color: #010202;
         }
-        
+
         .cm-scroller {
             overflow: auto;
             -webkit-overflow-scrolling: touch;
+            font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
         }
-        
+
         .cm-content {
-            caret-color: #58A6FF;
-            padding: 8px 0;
+            caret-color: #00A245;
+            padding: 16px 0;
         }
-        
+
         .cm-line {
-            padding: 0 8px;
+            padding: 0 16px;
         }
-        
+
         .cm-gutters {
-            background-color: #252526;
-            color: #858585;
+            background-color: #040704;
+            color: #4F4D48;
             border: none;
-            padding-right: 8px;
+            padding-right: 0;
         }
-        
+
         .cm-lineNumbers .cm-gutterElement {
-            padding: 0 8px 0 4px;
-            min-width: 40px;
+            padding: 0 10px 0 8px;
+            min-width: 48px;
+            text-align: right;
         }
-        
+
         .cm-activeLineGutter {
-            background-color: #2D2D2D;
+            background-color: #0A0F0B;
+            color: #74716B;
         }
-        
+
         .cm-activeLine {
-            background-color: #2D2D2D;
+            background-color: rgba(0, 162, 69, 0.06);
         }
-        
+
         .cm-cursor {
-            border-left-color: #58A6FF;
+            border-left-color: #00A245;
             border-left-width: 2px;
         }
-        
+
         .cm-selectionBackground {
-            background-color: #264F78 !important;
+            background-color: rgba(0, 162, 69, 0.25) !important;
         }
-        
+
         .cm-focused .cm-selectionBackground {
-            background-color: #264F78 !important;
+            background-color: rgba(0, 162, 69, 0.25) !important;
         }
-        
+
         .cm-placeholder {
-            color: #6A9955;
+            color: #4F4D48;
             font-style: italic;
         }
-        
-        /* Syntax highlighting - Python */
-        .cm-keyword { color: #C678DD; }
-        .cm-string { color: #98C379; }
-        .cm-number { color: #D19A66; }
-        .cm-comment { color: #5C6370; font-style: italic; }
-        .cm-function { color: #61AFEF; }
-        .cm-variableName { color: #E06C75; }
-        .cm-operator { color: #56B6C2; }
-        .cm-punctuation { color: #ABB2BF; }
+
+        /* Python 语法高亮（emerald 主题） */
+        .cm-keyword { color: #B28FEF; font-weight: 500; }
+        .cm-string { color: #5BAE5F; }
+        .cm-string2 { color: #5BAE5F; }
+        .cm-number { color: #ED835E; }
+        .cm-comment { color: #545F68; font-style: italic; }
+        .cm-function { color: #1DB8CE; }
+        .cm-variableName { color: #E9E8E4; }
+        .cm-variableName.cm-def { color: #E9E8E4; }
+        .cm-operator { color: #43AC9B; }
+        .cm-punctuation { color: #74716B; }
         .cm-className { color: #E5C07B; }
-        .cm-builtin { color: #56B6C2; }
-        .cm-property { color: #E06C75; }
-        .cm-definition { color: #61AFEF; }
+        .cm-builtin { color: #43AC9B; }
+        .cm-property { color: #1DB8CE; }
+        .cm-definition { color: #1DB8CE; }
         .cm-typeName { color: #E5C07B; }
-        
-        /* Auto-complete */
+        .cm-meta { color: #8A8FE1; }
+        .cm-attribute { color: #E5C07B; }
+        .cm-tag { color: #B28FEF; }
+        .cm-bracket { color: #74716B; }
+        .cm-atom { color: #ED835E; }
+
+        /* 自动补全 tooltip */
         .cm-tooltip-autocomplete {
-            background-color: #2D2D2D !important;
-            border: 1px solid #475569 !important;
-            border-radius: 4px;
+            background-color: #111812 !important;
+            border: 1px solid #212521 !important;
+            border-radius: 10px !important;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4) !important;
+            overflow: hidden;
         }
-        
+
         .cm-tooltip-autocomplete ul li {
-            padding: 4px 8px;
+            padding: 6px 12px;
+            font-size: 12px;
         }
-        
+
         .cm-tooltip-autocomplete ul li[aria-selected] {
-            background-color: #264F78 !important;
+            background-color: #005000 !important;
+            color: #E9E8E4 !important;
+        }
+
+        /* 搜索匹配高亮 */
+        .cm-searchMatch {
+            background-color: rgba(210, 154, 0, 0.25);
+            outline: 1px solid #D29A00;
+        }
+        .cm-searchMatch.cm-searchMatch-selected {
+            background-color: rgba(210, 154, 0, 0.5);
         }
     </style>
 </head>
 <body>
     <div id="editor"></div>
-    
+
     <script type="module">
         import { EditorState } from 'https://esm.sh/@codemirror/state@6.4.1';
         import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter, drawSelection, dropCursor, placeholder } from 'https://esm.sh/@codemirror/view@6.26.3';
@@ -125,10 +148,10 @@
         import { syntaxHighlighting, defaultHighlightStyle, bracketMatching, foldGutter, indentOnInput } from 'https://esm.sh/@codemirror/language@6.10.2';
         import { autocompletion, completionKeymap, closeBrackets, closeBracketsKeymap } from 'https://esm.sh/@codemirror/autocomplete@6.18.0';
         import { searchKeymap, highlightSelectionMatches } from 'https://esm.sh/@codemirror/search@6.5.6';
-        
+
         const config = window.config || {};
         const initialCode = config.initialCode || '# Welcome to PyBox\n# Start coding here\n\nprint("Hello, PyBox!")\n';
-        
+
         const updateListener = EditorView.updateListener.of((update) => {
             if (update.docChanged) {
                 const code = update.state.doc.toString();
@@ -138,37 +161,41 @@
                 });
             }
         });
-        
+
         const theme = EditorView.theme({
             '&': {
-                backgroundColor: '#1E1E1E',
-                color: '#ABB2BF',
+                backgroundColor: '#010202',
+                color: '#E9E8E4',
                 height: '100%'
             },
             '.cm-content': {
-                caretColor: '#58A6FF',
-                fontFamily: "'SF Mono', 'Menlo', monospace",
-                fontSize: (config.fontSize || 14) + 'px'
+                caretColor: '#00A245',
+                fontFamily: "'JetBrains Mono', 'SF Mono', 'Menlo', monospace",
+                fontSize: (config.fontSize || 13) + 'px',
+                lineHeight: '1.7'
             },
             '.cm-cursor': {
-                borderLeftColor: '#58A6FF'
+                borderLeftColor: '#00A245',
+                borderLeftWidth: '2px'
             },
             '.cm-gutters': {
-                backgroundColor: '#252526',
-                color: '#858585',
-                border: 'none'
+                backgroundColor: '#040704',
+                color: '#4F4D48',
+                border: 'none',
+                fontFamily: "'JetBrains Mono', 'SF Mono', 'Menlo', monospace"
             },
             '.cm-activeLineGutter': {
-                backgroundColor: '#2D2D2D'
+                backgroundColor: '#0A0F0B',
+                color: '#74716B'
             },
             '.cm-activeLine': {
-                backgroundColor: '#2D2D2D'
+                backgroundColor: 'rgba(0, 162, 69, 0.06)'
             },
             '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
-                backgroundColor: '#264F78'
+                backgroundColor: 'rgba(0, 162, 69, 0.25)'
             }
         });
-        
+
         const state = EditorState.create({
             doc: initialCode,
             extensions: [
@@ -199,12 +226,12 @@
                 placeholder('Start coding...')
             ]
         });
-        
+
         const view = new EditorView({
             state: state,
             parent: document.getElementById('editor')
         });
-        
+
         window.setCode = (code) => {
             view.dispatch({
                 changes: {
@@ -214,19 +241,19 @@
                 }
             });
         };
-        
+
         window.getCode = () => {
             return view.state.doc.toString();
         };
-        
+
         window.setFontSize = (size) => {
             document.querySelector('.cm-content').style.fontSize = size + 'px';
         };
-        
+
         window.focusEditor = () => {
             view.focus();
         };
-        
+
         window.webkit.messageHandlers.editor.postMessage({
             type: 'ready'
         });

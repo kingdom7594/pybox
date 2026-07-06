@@ -8,7 +8,7 @@ final class ErrorHandler: ObservableObject {
     @Published var currentAlert: AppError?
 
     private var logFileURL: URL?
-    private let logQueue = DispatchQueue(label: "com.pybox.ide.errorlog", qos: .utility)
+    private let logQueue = DispatchQueue(label: "com.huang.pybox.ide.errorlog", qos: .utility)
     private let dateFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]

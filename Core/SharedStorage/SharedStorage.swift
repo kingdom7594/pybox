@@ -3,7 +3,7 @@ import Foundation
 /// App Group 共享存储 - 用于 Shortcuts, Widget, Share Extension 共享数据
 /// 主 app 和 extension 都需要读取这里的数据
 enum SharedStorage {
-    static let appGroupID = "group.com.pybox.ide"
+    static let appGroupID = "group.com.huang.pybox.ide"
 
     /// 共享容器 URL (UserDefaults 等)
     static var containerURL: URL? {

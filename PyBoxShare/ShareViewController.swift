@@ -5,7 +5,7 @@ import UniformTypeIdentifiers
 @objc(ShareViewController)
 class ShareViewController: UIViewController {
 
-    private let appGroupID = "group.com.pybox.ide"
+    private let appGroupID = "group.com.huang.pybox.ide"
     private let typeIdentifierPython = "public.python-script"
     private let typeIdentifierText = "public.plain-text"
 

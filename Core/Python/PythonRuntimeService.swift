@@ -26,6 +26,40 @@ class PythonRuntimeService {
         return pythonInitialized
     }
     
+    /// 从 python_extensions.plist (base64 编码) 提取 .so 文件到 Caches 目录
+    private func extractExtensionsIfNeeded() -> String? {
+        guard let plistURL = Bundle.main.url(forResource: "python_extensions", withExtension: "plist") else {
+            NSLog("[PythonRuntime] python_extensions.plist not found")
+            return nil
+        }
+        let cachesDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        let extractDir = cachesDir.appendingPathComponent("python_extensions", isDirectory: true)
+        let markerFile = extractDir.appendingPathComponent(".extracted")
+        
+        if FileManager.default.fileExists(atPath: markerFile.path) {
+            return extractDir.path
+        }
+        
+        try? FileManager.default.removeItem(at: extractDir)
+        try? FileManager.default.createDirectory(at: extractDir, withIntermediateDirectories: true)
+        
+        guard let plistData = try? Data(contentsOf: plistURL),
+              let dict = try? PropertyListSerialization.propertyList(from: plistData, format: nil) as? [String: String] else {
+            return nil
+        }
+        
+        for (relativePath, b64) in dict {
+            guard let decoded = Data(base64Encoded: b64) else { continue }
+            let fileURL = extractDir.appendingPathComponent(relativePath)
+            try? FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try? decoded.write(to: fileURL)
+        }
+        
+        try? Data().write(to: markerFile)
+        NSLog("[PythonRuntime] Extracted \(dict.count) .so files to \(extractDir.path)")
+        return extractDir.path
+    }
+    
     /// 懒加载初始化 Python 运行时
     private func initializePython() {
         guard !pythonInitAttempted else { return }
@@ -33,17 +67,24 @@ class PythonRuntimeService {
         
         NSLog("[PythonRuntime] Initializing Python...")
         
-        // 设置 PYTHONHOME 指向 app bundle 内的 Python 标准库
-        if let bundlePath = Bundle.main.resourcePath {
-            let pythonHome = "\(bundlePath)/python3.14"
-            let sitePackages = "\(bundlePath)/site-packages"
-            setenv("PYTHONHOME", pythonHome, 1)
-            
-            // 设置 PYTHONPATH - 包含 stdlib, lib-dynload, site-packages
-            setenv("PYTHONPATH", "\(pythonHome):\(pythonHome)/lib-dynload:\(sitePackages)", 1)
-            NSLog("[PythonRuntime] PYTHONHOME: \(pythonHome)")
-            NSLog("[PythonRuntime] PYTHONPATH: \(sitePackages)")
+        let bundlePath = Bundle.main.bundlePath
+        
+        // PYTHONHOME: stdlib lives at .app root (NOT inside Python.framework,
+        // because Apple's strict validator scans framework contents and rejects
+        // any unsigned files like .py)
+        let pythonHome = "\(bundlePath)/python3.14"
+        let sitePackages = "\(pythonHome)/site-packages"
+        setenv("PYTHONHOME", pythonHome, 1)
+        
+        // PYTHONPATH: stdlib + extracted .so path + site-packages
+        var pythonPath = "\(pythonHome):\(sitePackages)"
+        if let extPath = extractExtensionsIfNeeded() {
+            pythonPath.append(":\(extPath)/lib-dynload:\(extPath)/site-packages/PIL")
         }
+        setenv("PYTHONPATH", pythonPath, 1)
+        
+        NSLog("[PythonRuntime] PYTHONHOME: \(pythonHome)")
+        NSLog("[PythonRuntime] PYTHONPATH: \(pythonPath)")
         
         // 验证 Python 是否可用
         pythonInitialized = checkPythonAvailable()
